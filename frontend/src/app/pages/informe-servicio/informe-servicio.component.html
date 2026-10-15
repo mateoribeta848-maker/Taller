@@ -1,0 +1,288 @@
+<div class="informe-page">
+  <div class="acciones no-print">
+    <button class="btn btn-secondary" (click)="volver()">
+      <i class="bi bi-arrow-left"></i> Volver a Trabajos
+    </button>
+
+    <div class="d-flex gap-2">
+      @if (!modoEdicion() && informe()?.informe?.id) {
+        <button class="btn btn-warning" (click)="activarEdicion()">
+          <i class="bi bi-pencil"></i> Editar Informe
+        </button>
+        <button class="btn btn-primary" (click)="imprimir()">
+          <i class="bi bi-printer"></i> Imprimir Informe
+        </button>
+      }
+      @if (modoEdicion()) {
+        <button class="btn btn-success" (click)="guardar()">
+          <i class="bi bi-check-lg"></i> Guardar Informe
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (cargando()) {
+    <div class="text-center p-5">
+      <div class="spinner-border text-danger"></div>
+      <p class="mt-2 text-muted">Cargando informe...</p>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="alert alert-danger m-3 no-print">
+      <i class="bi bi-exclamation-triangle"></i> {{ error() }}
+      <button class="btn btn-sm btn-outline-danger ms-3" (click)="volver()">Volver</button>
+    </div>
+  }
+
+  @if (!cargando() && informe()) {
+    <div class="informe-container">
+      <!-- ENCABEZADO -->
+      <div class="informe-header">
+        <div>
+          <h1 class="m-0"><i class="bi bi-gear-fill text-danger"></i> DemonCar</h1>
+          <p class="text-muted mb-0">Taller Automotriz Especializado</p>
+          <small class="text-muted">Santa Cruz, Bolivia</small>
+        </div>
+        <div class="text-end">
+          <h3 class="text-danger mb-1">INFORME DE SERVICIO</h3>
+          <p class="mb-0"><strong>Factura:</strong> {{ informe()!.informe.numero_factura }}</p>
+          <p class="mb-0"><strong>Fecha ingreso:</strong> {{ formatearFecha(informe()!.informe.fecha_entrada) }}</p>
+        </div>
+      </div>
+
+      <!-- ============================================ -->
+      <!-- CLIENTE (izquierda) Y VEHÍCULO (derecha)      -->
+      <!-- ============================================ -->
+      <table class="tabla-cliente-vehiculo mb-4">
+        <tr>
+          <!-- Columna izquierda: CLIENTE -->
+          <td class="celda-cliente">
+            <h6 class="text-muted text-uppercase mb-2">
+              <i class="bi bi-person-fill"></i> Cliente
+            </h6>
+            @if (informe()!.informe.foto_cliente) {
+              <div class="foto-informe foto-cliente mb-2">
+                <img [src]="informe()!.informe.foto_cliente!" alt="Cliente" />
+              </div>
+            }
+            <p class="mb-1"><strong>{{ informe()!.informe.cliente_nombre }}</strong></p>
+            <p class="mb-1"><small>CI: {{ informe()!.informe.cliente_cedula || '-' }}</small></p>
+            <p class="mb-1"><small>Tel: {{ informe()!.informe.cliente_telefono || '-' }}</small></p>
+          </td>
+
+          <!-- Columna derecha: VEHÍCULO -->
+          <td class="celda-vehiculo text-end">
+            <h6 class="text-muted text-uppercase mb-2">
+              <i class="bi bi-car-front-fill"></i> Vehículo
+            </h6>
+            @if (informe()!.informe.foto_carro) {
+              <div class="foto-informe foto-carro mb-2 ms-auto">
+                <img [src]="informe()!.informe.foto_carro!" alt="Carro" />
+              </div>
+            }
+            <p class="mb-1"><strong>{{ informe()!.informe.carro }}</strong></p>
+            <p class="mb-1"><small>Servicio: {{ informe()!.informe.descripcion_trabajo }}</small></p>
+          </td>
+        </tr>
+      </table>
+
+      <!-- ESTADO AL INGRESO -->
+      <div class="card-datos mb-4">
+        <h6 class="text-muted text-uppercase mb-3"><i class="bi bi-speedometer2"></i> Estado al ingreso</h6>
+        <div class="row">
+          <div class="col-md-4">
+            <label class="form-label small text-muted">Kilometraje</label>
+            @if (modoEdicion()) {
+              <div class="input-group">
+                <input type="number" class="form-control" [(ngModel)]="form.kilometraje" min="0" />
+                <span class="input-group-text">km</span>
+              </div>
+            } @else {
+              <p class="mb-0"><strong>{{ informe()!.informe.kilometraje | number }} km</strong></p>
+            }
+          </div>
+          <div class="col-md-4">
+            <label class="form-label small text-muted">Nivel de combustible</label>
+            @if (modoEdicion()) {
+              <select class="form-select" [(ngModel)]="form.nivel_combustible">
+                <option value="vacio">Vacío</option>
+                <option value="1/4">1/4</option>
+                <option value="1/2">1/2</option>
+                <option value="3/4">3/4</option>
+                <option value="lleno">Lleno</option>
+              </select>
+            } @else {
+              <p class="mb-0"><strong>{{ nivelCombustibleTexto(informe()!.informe.nivel_combustible) }}</strong></p>
+            }
+          </div>
+          <div class="col-md-4">
+            <label class="form-label small text-muted">Garantía</label>
+            @if (modoEdicion()) {
+              <div class="input-group">
+                <input type="number" class="form-control" [(ngModel)]="form.garantia_dias" min="0" />
+                <span class="input-group-text">días</span>
+              </div>
+            } @else {
+              <p class="mb-0"><strong>{{ informe()!.informe.garantia_dias }} días</strong></p>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- REPUESTOS -->
+      @if (informe()!.repuestos && informe()!.repuestos.length > 0) {
+        <h6 class="text-muted text-uppercase mt-4 mb-2"><i class="bi bi-tools"></i> Repuestos utilizados</h6>
+        <table class="table table-sm table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th>Código</th><th>Repuesto</th>
+              <th class="text-center">Cantidad</th>
+              <th class="text-end">P. Unit</th>
+              <th class="text-end">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (r of informe()!.repuestos; track r.id) {
+              <tr>
+                <td><code>{{ r.repuesto_codigo }}</code></td>
+                <td>{{ r.repuesto_nombre }}</td>
+                <td class="text-center">{{ r.cantidad }}</td>
+                <td class="text-end">{{ formatearBs(r.precio_unitario) }}</td>
+                <td class="text-end">{{ formatearBs(r.subtotal) }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+
+      <!-- CHECKLIST -->
+      <h6 class="text-muted text-uppercase mt-4 mb-2"><i class="bi bi-check2-square"></i> Checklist de verificación</h6>
+      <table class="table table-sm table-bordered">
+        <thead class="table-light">
+          <tr>
+            <th style="width: 60%;">Punto verificado</th>
+            <th style="width: 15%;" class="text-center">Estado</th>
+            <th>Observación</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of checklist; track $index) {
+            <tr>
+              <td>
+                @if (modoEdicion()) {
+                  <input type="text" class="form-control form-control-sm" [(ngModel)]="item.item" />
+                } @else {
+                  {{ item.item }}
+                }
+              </td>
+              <td class="text-center">
+                @if (modoEdicion()) {
+                  <select class="form-select form-select-sm" [(ngModel)]="item.estado">
+                    <option value="ok">✓ OK</option>
+                    <option value="revisar">⚠ Revisar</option>
+                    <option value="no_aplica">— N/A</option>
+                  </select>
+                } @else {
+                  <span class="badge-estado"
+                    [class.badge-finalizado]="item.estado === 'ok'"
+                    [class.badge-pendiente]="item.estado === 'revisar'"
+                    [class.badge-secondary]="item.estado === 'no_aplica'">
+                    @switch (item.estado) {
+                      @case ('ok') { ✓ OK }
+                      @case ('revisar') { ⚠ Revisar }
+                      @default { — N/A }
+                    }
+                  </span>
+                }
+              </td>
+              <td>
+                @if (modoEdicion()) {
+                  <input type="text" class="form-control form-control-sm" [(ngModel)]="item.observacion" />
+                } @else {
+                  {{ item.observacion || '-' }}
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <!-- HALLAZGOS Y RECOMENDACIONES -->
+      <div class="row mt-4">
+        <div class="col-md-6">
+          <h6 class="text-muted text-uppercase mb-2"><i class="bi bi-search"></i> Hallazgos</h6>
+          @if (modoEdicion()) {
+            <textarea class="form-control" rows="4" [(ngModel)]="form.hallazgos"></textarea>
+          } @else {
+            <p class="p-3 bg-light rounded">{{ informe()!.informe.hallazgos || 'Sin hallazgos registrados' }}</p>
+          }
+        </div>
+        <div class="col-md-6">
+          <h6 class="text-muted text-uppercase mb-2"><i class="bi bi-lightbulb"></i> Recomendaciones</h6>
+          @if (modoEdicion()) {
+            <textarea class="form-control" rows="4" [(ngModel)]="form.recomendaciones"></textarea>
+          } @else {
+            <p class="p-3 bg-light rounded">{{ informe()!.informe.recomendaciones || 'Sin recomendaciones' }}</p>
+          }
+        </div>
+      </div>
+
+      <!-- PRÓXIMO SERVICIO -->
+      <div class="card-proximo mt-4 mb-4">
+        <h6 class="text-muted text-uppercase mb-3"><i class="bi bi-calendar-event"></i> Próximo servicio recomendado</h6>
+        <div class="row">
+          <div class="col-md-6">
+            <label class="form-label small text-muted">A los</label>
+            @if (modoEdicion()) {
+              <div class="input-group">
+                <input type="number" class="form-control" [(ngModel)]="form.proximo_servicio_km" min="0" step="1000" />
+                <span class="input-group-text">km</span>
+              </div>
+            } @else {
+              <p class="mb-0"><strong>{{ informe()!.informe.proximo_servicio_km | number }} km</strong></p>
+            }
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small text-muted">O el</label>
+            @if (modoEdicion()) {
+              <input type="date" class="form-control" [(ngModel)]="form.proximo_servicio_fecha" />
+            } @else {
+              <p class="mb-0"><strong>{{ formatearFecha(informe()!.informe.proximo_servicio_fecha) }}</strong></p>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- FIRMAS -->
+      <div class="row mt-5 pt-4">
+        <div class="col-md-6 text-center">
+          @if (modoEdicion()) {
+            <input type="text" class="form-control text-center" [(ngModel)]="form.firma_tecnico" placeholder="Nombre del técnico" />
+          } @else {
+            <div class="firma-linea"><strong>{{ informe()!.informe.firma_tecnico }}</strong></div>
+          }
+          <hr style="border-top: 1px solid #000; margin: 8px auto; width: 80%;" />
+          <small class="text-muted">Técnico responsable</small>
+        </div>
+        <div class="col-md-6 text-center">
+          @if (modoEdicion()) {
+            <input type="text" class="form-control text-center" [(ngModel)]="form.firma_cliente" placeholder="Nombre del cliente" />
+          } @else {
+            <div class="firma-linea"><strong>{{ informe()!.informe.firma_cliente || 'Cliente' }}</strong></div>
+          }
+          <hr style="border-top: 1px solid #000; margin: 8px auto; width: 80%;" />
+          <small class="text-muted">Recibí conforme</small>
+        </div>
+      </div>
+
+      <!-- PIE -->
+      <div class="text-center mt-5 pt-4 border-top">
+        <p class="text-muted mb-0">
+          <strong>DemonCar - Taller Automotriz</strong><br />
+          <small>Este informe certifica los trabajos realizados al vehículo.</small>
+        </p>
+      </div>
+    </div>
+  }
+</div>

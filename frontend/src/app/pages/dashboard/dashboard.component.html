@@ -1,0 +1,216 @@
+<!-- ============================================ -->
+<!-- BIENVENIDA                                    -->
+<!-- ============================================ -->
+<div class="welcome-banner mb-4">
+  <div>
+    <h3 class="mb-1">
+      <i class="bi bi-hand-thumbs-up-fill"></i>
+      ¡Bienvenido, {{ authService.usuario()?.nombre }}!
+    </h3>
+    <p class="mb-0 text-muted">
+      Resumen general del taller de frenos
+    </p>
+  </div>
+  <div class="text-end">
+    <div class="text-muted small">
+      <i class="bi bi-calendar3"></i> {{ hoy | date: 'EEEE, d MMMM y' }}
+    </div>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- TARJETAS DE ESTADÍSTICAS                      -->
+<!-- ============================================ -->
+@if (cargando()) {
+  <div class="text-center p-5">
+    <div class="spinner-border text-danger"></div>
+    <p class="mt-2 text-muted">Cargando dashboard...</p>
+  </div>
+} @else {
+  <div class="row g-3 mb-4">
+    <!-- Clientes -->
+    <div class="col-md-6 col-lg-3">
+      <div class="stat-card bg-gradient-blue">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <div class="stat-label">Clientes</div>
+            <div class="stat-value">{{ estadisticas()?.clientes || 0 }}</div>
+          </div>
+          <i class="bi bi-people-fill stat-icon"></i>
+        </div>
+        <a routerLink="/clientes" class="stat-link">
+          Ver todos <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- Repuestos -->
+    <div class="col-md-6 col-lg-3">
+      <div class="stat-card bg-gradient-purple">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <div class="stat-label">Repuestos</div>
+            <div class="stat-value">{{ estadisticas()?.repuestos || 0 }}</div>
+          </div>
+          <i class="bi bi-tools stat-icon"></i>
+        </div>
+        <a routerLink="/repuestos" class="stat-link">
+          Ver todos <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- Trabajos -->
+    <div class="col-md-6 col-lg-3">
+      <div class="stat-card bg-gradient-green">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <div class="stat-label">Trabajos</div>
+            <div class="stat-value">{{ estadisticas()?.trabajos || 0 }}</div>
+          </div>
+          <i class="bi bi-wrench-adjustable stat-icon"></i>
+        </div>
+        <a routerLink="/trabajos" class="stat-link">
+          Ver todos <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- Bajo stock -->
+    <div class="col-md-6 col-lg-3">
+      <div class="stat-card" [class]="(estadisticas()?.bajoStock || 0) > 0 ? 'bg-gradient-orange' : 'bg-gradient-green'">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <div class="stat-label">Bajo Stock</div>
+            <div class="stat-value">{{ estadisticas()?.bajoStock || 0 }}</div>
+          </div>
+          <i class="bi bi-exclamation-triangle-fill stat-icon"></i>
+        </div>
+        <a routerLink="/repuestos" class="stat-link">
+          Revisar <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- INGRESOS DEL MES                              -->
+  <!-- ============================================ -->
+  <div class="row g-3 mb-4">
+    <div class="col-12">
+      <div class="card-ingreso">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <div class="stat-label text-uppercase" style="color: #616161;">
+              <i class="bi bi-cash-coin"></i> Ingresos del mes
+            </div>
+            <h1 class="m-0 text-success mt-2">
+              {{ formatearBs(estadisticas()?.ingresosMes) }}
+            </h1>
+            <small class="text-muted">
+              Basado en trabajos finalizados
+            </small>
+          </div>
+          <i class="bi bi-graph-up-arrow" style="font-size: 5rem; color: #e8f5e9;"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- ÚLTIMOS TRABAJOS Y BAJO STOCK                 -->
+  <!-- ============================================ -->
+  <div class="row g-3">
+    <!-- Últimos trabajos -->
+    <div class="col-lg-7">
+      <div class="card-table">
+        <div class="card-header">
+          <h5 class="m-0">
+            <i class="bi bi-clock-history text-danger"></i> Últimos trabajos
+          </h5>
+          <a routerLink="/trabajos" class="btn btn-sm btn-outline-secondary">
+            Ver todos <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+
+        @if (ultimosTrabajos().length === 0) {
+          <div class="text-center text-muted py-5">
+            <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+            No hay trabajos registrados aún
+          </div>
+        } @else {
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead>
+                <tr>
+                  <th>Factura</th>
+                  <th>Cliente</th>
+                  <th>Estado</th>
+                  <th class="text-end">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (t of ultimosTrabajos(); track t.id) {
+                  <tr>
+                    <td>
+                      <a [routerLink]="['/trabajos', t.id, 'factura']" class="text-danger fw-bold text-decoration-none">
+                        {{ t.numero_factura }}
+                      </a>
+                    </td>
+                    <td>{{ t.cliente_nombre }}</td>
+                    <td>
+                      <span class="badge-estado" [class]="colorEstado(t.estado)">
+                        {{ textoEstado(t.estado) }}
+                      </span>
+                    </td>
+                    <td class="text-end fw-bold text-success">
+                      {{ formatearBs(t.total) }}
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Bajo stock -->
+    <div class="col-lg-5">
+      <div class="card-table">
+        <div class="card-header">
+          <h5 class="m-0">
+            <i class="bi bi-exclamation-triangle-fill text-warning"></i>
+            Alertas de stock
+          </h5>
+          <a routerLink="/repuestos" class="btn btn-sm btn-outline-secondary">
+            Ver todos
+          </a>
+        </div>
+
+        @if (repuestosBajoStock().length === 0) {
+          <div class="text-center text-muted py-5">
+            <i class="bi bi-check-circle-fill fs-1 d-block mb-2 text-success"></i>
+            <p class="mb-0">¡Todo el stock está en orden!</p>
+          </div>
+        } @else {
+          <ul class="list-group list-group-flush">
+            @for (r of repuestosBajoStock(); track r.id) {
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <div class="fw-bold">{{ r.nombre }}</div>
+                  <small class="text-muted">
+                    <code>{{ r.codigo }}</code> · {{ r.categoria }}
+                  </small>
+                </div>
+                <span class="badge bg-danger rounded-pill">
+                  {{ r.stock }} / {{ r.stock_minimo }}
+                </span>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    </div>
+  </div>
+}

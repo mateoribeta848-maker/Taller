@@ -1,0 +1,154 @@
+<div class="factura-page">
+  <div class="acciones no-print">
+    <button class="btn btn-secondary" (click)="volver()">
+      <i class="bi bi-arrow-left"></i> Volver a Trabajos
+    </button>
+    <button class="btn btn-primary" (click)="imprimir()">
+      <i class="bi bi-printer"></i> Imprimir Factura
+    </button>
+  </div>
+
+  @if (cargando()) {
+    <div class="text-center p-5">
+      <div class="spinner-border text-danger"></div>
+      <p class="mt-2 text-muted">Cargando factura...</p>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="alert alert-danger m-3">
+      <i class="bi bi-exclamation-triangle"></i> {{ error() }}
+      <button class="btn btn-sm btn-outline-danger ms-3" (click)="volver()">Volver</button>
+    </div>
+  }
+
+  @if (detalle() && !cargando()) {
+    <div class="factura-container">
+      <!-- ENCABEZADO -->
+      <div class="factura-header">
+        <div>
+          <h1 class="m-0"><i class="bi bi-gear-fill text-danger"></i> DemonCar</h1>
+          <p class="text-muted mb-0">Taller Automotriz Especializado</p>
+          <small class="text-muted">Santa Cruz, Bolivia</small>
+        </div>
+        <div class="text-end">
+          <h3 class="text-danger mb-1">{{ detalle()!.trabajo.numero_factura }}</h3>
+          <p class="mb-0">
+            <strong>Fecha:</strong>
+            {{ detalle()!.trabajo.fecha_entrada | date: 'dd/MM/yyyy HH:mm' }}
+          </p>
+          @if (detalle()!.trabajo.fecha_salida) {
+            <p class="mb-0">
+              <strong>Salida:</strong>
+              {{ detalle()!.trabajo.fecha_salida | date: 'dd/MM/yyyy HH:mm' }}
+            </p>
+          }
+          <span class="badge-estado" [class]="colorEstado(detalle()!.trabajo.estado)">
+            {{ textoEstado(detalle()!.trabajo.estado) }}
+          </span>
+        </div>
+      </div>
+
+      <!-- CLIENTE (izquierda) Y VEHÍCULO (derecha) -->
+      <div class="row mb-4 align-items-start">
+        <!-- CLIENTE -->
+        <div class="col-md-6">
+          <h6 class="text-muted text-uppercase mb-2"><i class="bi bi-person-fill"></i> Cliente</h6>
+          <div class="d-flex gap-3">
+            @if (detalle()!.trabajo.foto_cliente) {
+              <div class="foto-factura foto-cliente">
+                <img [src]="detalle()!.trabajo.foto_cliente!" alt="Cliente" />
+              </div>
+            }
+            <div class="flex-grow-1">
+              <p class="mb-1"><strong>{{ detalle()!.trabajo.cliente_nombre }}</strong></p>
+              <p class="mb-1"><small>CI: {{ detalle()!.trabajo.cliente_cedula || '-' }}</small></p>
+              <p class="mb-1"><small>Tel: {{ detalle()!.trabajo.cliente_telefono || '-' }}</small></p>
+              <p class="mb-1"><small>{{ detalle()!.trabajo.cliente_direccion || '-' }}</small></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- VEHÍCULO -->
+        <div class="col-md-6">
+          <h6 class="text-muted text-uppercase mb-2 text-md-end">
+            <i class="bi bi-car-front-fill"></i> Vehículo
+          </h6>
+          <div class="d-flex gap-3 justify-content-md-end align-items-start">
+            <div class="text-md-end">
+              <p class="mb-1"><strong>{{ detalle()!.trabajo.carro }}</strong></p>
+              <p class="mb-1"><small>Servicio: {{ detalle()!.trabajo.descripcion }}</small></p>
+            </div>
+            @if (detalle()!.trabajo.foto_carro) {
+              <div class="foto-factura foto-carro">
+                <img [src]="detalle()!.trabajo.foto_carro!" alt="Carro" />
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- TABLA DE REPUESTOS -->
+      @if (detalle()!.detalle.length > 0) {
+        <h6 class="text-muted text-uppercase mt-4 mb-2">
+          <i class="bi bi-tools"></i> Repuestos utilizados
+        </h6>
+        <table class="table table-sm table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th style="width: 120px;">Código</th>
+              <th>Repuesto</th>
+              <th class="text-center" style="width: 90px;">Cant.</th>
+              <th class="text-end" style="width: 130px;">P. Unit</th>
+              <th class="text-end" style="width: 130px;">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (d of detalle()!.detalle; track d.id) {
+              <tr>
+                <td><code>{{ d.repuesto_codigo }}</code></td>
+                <td>{{ d.repuesto_nombre }}</td>
+                <td class="text-center">{{ d.cantidad }}</td>
+                <td class="text-end">{{ formatearBs(d.precio_unitario) }}</td>
+                <td class="text-end">{{ formatearBs(d.subtotal) }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+
+      <!-- TOTALES -->
+      <div class="row mt-4">
+        <div class="col-md-6 offset-md-6">
+          <table class="table table-sm mb-0 tabla-totales">
+            <tr><td>Mano de obra:</td><td class="text-end">{{ formatearBs(detalle()!.trabajo.costo_mano_obra) }}</td></tr>
+            <tr><td>Repuestos:</td><td class="text-end">{{ formatearBs(detalle()!.trabajo.costo_repuestos) }}</td></tr>
+            <tr><td>Descuento:</td><td class="text-end text-danger">- {{ formatearBs(detalle()!.trabajo.descuento) }}</td></tr>
+            <tr class="border-top"><td><strong>Subtotal:</strong></td><td class="text-end"><strong>{{ formatearBs(detalle()!.trabajo.subtotal) }}</strong></td></tr>
+            <tr><td>IVA (13%):</td><td class="text-end">{{ formatearBs(detalle()!.trabajo.iva) }}</td></tr>
+            <tr class="border-top bg-light">
+              <td><strong class="fs-5">TOTAL A PAGAR:</strong></td>
+              <td class="text-end"><span class="factura-total">{{ formatearBs(detalle()!.trabajo.total) }}</span></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- OBSERVACIONES -->
+      @if (detalle()!.trabajo.observaciones) {
+        <div class="mt-4 p-3 bg-light rounded">
+          <strong><i class="bi bi-chat-left-text"></i> Observaciones:</strong>
+          <p class="mb-0 mt-1">{{ detalle()!.trabajo.observaciones }}</p>
+        </div>
+      }
+
+      <!-- PIE -->
+      <div class="text-center mt-5 pt-4 border-top">
+        <p class="text-muted mb-0">
+          ¡Gracias por confiar en nosotros!<br />
+          <small>Este documento es una constancia del servicio prestado.</small>
+        </p>
+      </div>
+    </div>
+  }
+</div>

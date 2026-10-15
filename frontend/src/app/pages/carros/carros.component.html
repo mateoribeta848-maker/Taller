@@ -1,0 +1,196 @@
+<!-- ============================================ -->
+<!-- TABLA DE CARROS                               -->
+<!-- ============================================ -->
+<div class="card-table">
+  <div class="card-header">
+    <div>
+      <h4 class="m-0">
+        <i class="bi bi-car-front-fill text-danger"></i> Tipos de Carros
+      </h4>
+      <small class="text-muted">Marcas y modelos registrados</small>
+    </div>
+
+    <div class="d-flex gap-2 flex-wrap">
+      <select
+        class="form-select"
+        style="width: 160px;"
+        [value]="filtroFreno()"
+        (change)="filtroFreno.set($any($event.target).value)"
+      >
+        <option value="todos">Todos los frenos</option>
+        <option value="Disco">Disco</option>
+        <option value="Tambor">Tambor</option>
+        <option value="ABS">ABS</option>
+        <option value="Mixto">Mixto</option>
+      </select>
+
+      <div class="input-group" style="width: 250px;">
+        <span class="input-group-text"><i class="bi bi-search"></i></span>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Buscar marca o modelo..."
+          [value]="busqueda()"
+          (input)="busqueda.set($any($event.target).value)"
+        />
+      </div>
+
+      <button class="btn btn-primary" (click)="abrirCrear()">
+        <i class="bi bi-plus-lg"></i> Nuevo Carro
+      </button>
+    </div>
+  </div>
+
+  @if (cargando()) {
+    <div class="text-center p-5">
+      <div class="spinner-border text-danger"></div>
+      <p class="mt-2 text-muted">Cargando carros...</p>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="alert alert-danger m-3">
+      <i class="bi bi-exclamation-triangle"></i> {{ error() }}
+    </div>
+  }
+
+  @if (!cargando() && !error()) {
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th style="width: 60px;">ID</th>
+            <th>Marca</th>
+            <th>Modelo</th>
+            <th class="text-center">Año</th>
+            <th class="text-center">Tipo de Freno</th>
+            <th style="width: 130px;" class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of carrosFiltrados; track c.id) {
+            <tr>
+              <td><strong>#{{ c.id }}</strong></td>
+              <td>
+                <i class="bi bi-car-front-fill text-danger me-2"></i>
+                <strong>{{ c.marca }}</strong>
+              </td>
+              <td>{{ c.modelo }}</td>
+              <td class="text-center">
+                <span class="badge bg-dark">{{ c.anio || '-' }}</span>
+              </td>
+              <td class="text-center">
+                <span class="badge-estado" [class]="colorFreno(c.tipo_freno)">
+                  {{ c.tipo_freno }}
+                </span>
+              </td>
+              <td class="text-center">
+                <button
+                  class="btn btn-sm btn-outline-warning me-1"
+                  (click)="abrirEditar(c)"
+                  title="Editar"
+                >
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="eliminar(c)"
+                  title="Eliminar"
+                >
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+            </tr>
+          }
+
+          @if (carrosFiltrados.length === 0) {
+            <tr>
+              <td colspan="6" class="text-center text-muted py-4">
+                <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                No hay carros que coincidan
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+
+<!-- ============================================ -->
+<!-- MODAL CREAR/EDITAR                            -->
+<!-- ============================================ -->
+@if (mostrarModal()) {
+  <div class="modal-backdrop-custom" (click)="cerrarModal()"></div>
+  <div class="modal-custom">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">
+          <i class="bi" [class]="editando() ? 'bi-pencil-square' : 'bi-plus-circle'"></i>
+          {{ editando() ? 'Editar Carro' : 'Nuevo Carro' }}
+        </h5>
+        <button class="btn-close btn-close-white" (click)="cerrarModal()"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Marca *</label>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="carroForm.marca"
+              placeholder="Ej: Toyota"
+              list="marcas-sugeridas"
+            />
+            <datalist id="marcas-sugeridas">
+              @for (m of marcasUnicas; track m) {
+                <option [value]="m"></option>
+              }
+            </datalist>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Modelo *</label>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="carroForm.modelo"
+              placeholder="Ej: Corolla"
+            />
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Año</label>
+            <input
+              type="number"
+              class="form-control"
+              [(ngModel)]="carroForm.anio"
+              min="1950"
+              max="2100"
+            />
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Tipo de freno</label>
+            <select class="form-select" [(ngModel)]="carroForm.tipo_freno">
+              @for (t of tiposFreno; track t) {
+                <option [value]="t">{{ t }}</option>
+              }
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="cerrarModal()">
+          <i class="bi bi-x-lg"></i> Cancelar
+        </button>
+        <button class="btn btn-primary" (click)="guardar()">
+          <i class="bi bi-check-lg"></i>
+          {{ editando() ? 'Actualizar' : 'Guardar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

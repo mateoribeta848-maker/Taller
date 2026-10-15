@@ -1,0 +1,9 @@
+/* Los estilos están en styles.css global, aquí solo ajustes finos */
+.login-card form .form-control {
+  border-left: none;
+}
+
+.login-card form .input-group-text {
+  background-color: #f8f9fa;
+  border-right: none;
+}

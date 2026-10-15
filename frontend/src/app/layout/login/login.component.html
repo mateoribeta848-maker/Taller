@@ -1,0 +1,65 @@
+<div class="login-page">
+  <div class="login-card">
+    <div class="login-logo">🚗</div>
+    <h2 class="login-title">DemonCar</h2>
+    <p class="login-subtitle">Taller Automotriz</p>
+
+    <form (ngSubmit)="onSubmit()">
+      <div class="mb-3">
+        <label for="email" class="form-label">Correo electrónico</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+          <input
+            type="email"
+            id="email"
+            class="form-control"
+            placeholder="tu@email.com"
+            [(ngModel)]="email"
+            name="email"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">Contraseña</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-lock"></i></span>
+          <input
+            type="password"
+            id="password"
+            class="form-control"
+            placeholder="••••••••"
+            [(ngModel)]="password"
+            name="password"
+            required
+          />
+        </div>
+      </div>
+
+      @if (error()) {
+        <div class="alert alert-danger py-2">
+          <i class="bi bi-exclamation-triangle"></i> {{ error() }}
+        </div>
+      }
+
+      <button
+        type="submit"
+        class="btn btn-primary w-100 py-2"
+        [disabled]="cargando()"
+      >
+        @if (cargando()) {
+          <span class="spinner-border spinner-border-sm me-2"></span>
+          Ingresando...
+        } @else {
+          <i class="bi bi-box-arrow-in-right me-2"></i>
+          Iniciar sesión
+        }
+      </button>
+    </form>
+
+    <div class="text-center mt-4 text-muted" style="font-size: 0.8rem;">
+      <i class="bi bi-info-circle"></i> Usuario: admin&#64;taller.com / admin123
+    </div>
+  </div>
+</div>
