@@ -62,6 +62,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pages/informe-servicio/informe-servicio.component').then(m => m.InformeServicioComponent),
       },
+      {
+        path: 'simulador',
+        loadComponent: () =>
+          import('./pages/simulador/simulador.component').then(m => m.SimuladorComponent),
+      },
     ],
   },
 

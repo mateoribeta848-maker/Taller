@@ -1,0 +1,456 @@
+<div class="simulador-page">
+  <!-- ENCABEZADO -->
+  <div class="sim-header">
+    <div>
+      <h2 class="m-0">
+        <i class="bi bi-cpu-fill text-danger"></i> Simulador de Inyectores
+      </h2>
+      <p class="text-muted mb-0">Visualiza el patrón de pulverización según el estado del inyector</p>
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-warning" (click)="resetear()">
+        <i class="bi bi-arrow-counterclockwise"></i> Resetear
+      </button>
+      <button class="btn btn-primary" (click)="simular()">
+        <i class="bi bi-play-fill"></i> Simular
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SLIDER DE CONTROL DE MEZCLA                   -->
+  <!-- ============================================ -->
+  <div class="card-panel mb-3 slider-mezcla-panel">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <h5 class="panel-title mb-0" style="border: none; padding: 0;">
+          <i class="bi bi-sliders2 text-danger"></i> Control de mezcla (AFR)
+        </h5>
+        <small class="text-muted">AFR bajo = RICA (mucho combustible) · AFR alto = POBRE (poco combustible)</small>
+      </div>
+      <div class="d-flex gap-2 align-items-center">
+        <button
+          class="btn btn-sm"
+          [class]="usarAfrManual() ? 'btn-warning' : 'btn-outline-secondary'"
+          (click)="toggleAfrManual()"
+        >
+          <i class="bi" [class]="usarAfrManual() ? 'bi-hand-index-thumb-fill' : 'bi-hand-index-thumb'"></i>
+          {{ usarAfrManual() ? 'Modo MANUAL' : 'Modo AUTO' }}
+        </button>
+        @if (usarAfrManual()) {
+          <button class="btn btn-sm btn-outline-success" (click)="resetearAfrAutomatico()">
+            <i class="bi bi-arrow-repeat"></i> Volver a AUTO
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="slider-mezcla-container">
+      <!-- IZQUIERDA: RICA (AFR bajo) -->
+      <div class="slider-etiqueta slider-etiqueta-rica">
+        <i class="bi bi-droplet-fill"></i>
+        <span>RICA</span>
+        <small>AFR 8:1</small>
+      </div>
+
+      <!-- Slider central -->
+      <div class="slider-central">
+        <div class="slider-track-labels">
+          <span class="rica">8</span>
+          <span class="rica">9</span>
+          <span class="rica">10</span>
+          <span>11</span>
+          <span>12</span>
+          <span>13</span>
+          <span class="ideal">14.7</span>
+          <span>15</span>
+          <span>16</span>
+          <span class="pobre">17</span>
+          <span class="pobre">18</span>
+        </div>
+
+        <input
+          type="range"
+          class="form-range slider-afr"
+          min="8"
+          max="18"
+          step="0.1"
+          [value]="afr()"
+          (input)="onAfrSliderChange(+$any($event.target).value)"
+        />
+
+        <div class="slider-indicador-actual" [style.left.%]="posicionAgujaAFR()">
+          <div class="slider-burbuja" [class]="claseMezcla()">
+            {{ afr().toFixed(1) }}:1
+          </div>
+        </div>
+
+        <div class="slider-estado-texto">
+          <span class="badge-mezcla" [class]="claseMezcla()">
+            {{ textoAfrSlider() }}
+          </span>
+        </div>
+      </div>
+
+      <!-- DERECHA: POBRE (AFR alto) -->
+      <div class="slider-etiqueta slider-etiqueta-pobre">
+        <i class="bi bi-wind"></i>
+        <span>POBRE</span>
+        <small>AFR 18:1</small>
+      </div>
+    </div>
+
+    <p class="text-muted small mt-2 mb-0 text-center">
+      <i class="bi bi-info-circle"></i>
+      @if (usarAfrManual()) {
+        Estás controlando la mezcla manualmente. Mueve el slider: <strong class="text-danger">izquierda = RICA</strong>, <strong class="text-warning">derecha = POBRE</strong>.
+      } @else {
+        La mezcla se calcula automáticamente. Haz clic en "Modo AUTO" para controlarla manualmente.
+      }
+    </p>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- BANNER DE ADVERTENCIA GRANDE                  -->
+  <!-- ============================================ -->
+  @if (tipoMezcla() !== 'ideal') {
+    <div class="banner-alerta"
+         [class.banner-rica]="tipoMezcla() === 'rica'"
+         [class.banner-pobre]="tipoMezcla() === 'pobre'">
+      <div class="banner-icono">
+        <i class="bi" [class]="tipoMezcla() === 'rica' ? 'bi-droplet-fill' : 'bi-wind'"></i>
+      </div>
+      <div class="banner-texto">
+        <h4 class="mb-1">
+          @if (tipoMezcla() === 'rica') {
+            ⚠️ MEZCLA RICA DETECTADA
+          } @else {
+            ⚠️ MEZCLA POBRE DETECTADA
+          }
+        </h4>
+        <p class="mb-0">
+          @if (tipoMezcla() === 'rica') {
+            El sistema está inyectando <strong>DEMASIADO combustible</strong>. AFR actual: <strong>{{ afr().toFixed(2) }}:1</strong> (ideal: 14.7:1).
+          } @else {
+            El sistema está inyectando <strong>POCO combustible</strong>. AFR actual: <strong>{{ afr().toFixed(2) }}:1</strong> (ideal: 14.7:1).
+          }
+        </p>
+      </div>
+      <div class="banner-medidor">
+        <div class="medidor-afr">
+          <div class="medidor-zona-rica"></div>
+          <div class="medidor-zona-ideal"></div>
+          <div class="medidor-zona-pobre"></div>
+          <div class="medidor-aguja" [style.left.%]="posicionAgujaAFR()"></div>
+        </div>
+        <small class="text-muted d-block mt-1">Rica 8:1 — Ideal 14.7:1 — Pobre 18:1</small>
+      </div>
+    </div>
+  }
+
+  <!-- ============================================ -->
+  <!-- VISUALIZACIÓN DE LOS 4 INYECTORES              -->
+  <!-- ============================================ -->
+  <div class="card-panel mb-3">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h5 class="panel-title mb-0" style="border: none; padding: 0;">
+        <i class="bi bi-eyedropper"></i> Patrón de pulverización
+      </h5>
+      <div class="indicador-mezcla">
+        <span class="etiqueta-mezcla">Mezcla:</span>
+        <span class="badge-mezcla" [class]="claseMezcla()">
+          {{ textoMezcla() }}
+        </span>
+      </div>
+    </div>
+
+    <div class="inyectores-grid">
+      @for (i of [0,1,2,3]; track i) {
+        <div class="inyector-card"
+             [class]="'modo-' + modoInyector()"
+             [class.tipo-rica]="tipoMezcla() === 'rica'"
+             [class.tipo-pobre]="tipoMezcla() === 'pobre'"
+             [class.tipo-ideal]="tipoMezcla() === 'ideal'">
+          <div class="inyector-titulo">
+            <i class="bi" [class]="iconoModo()"></i>
+            Inyector #{{ i + 1 }} - {{ textoModo() }}
+          </div>
+
+          <div class="inyector-body">
+            <div class="inyector-cuerpo">
+              <div class="tapa"></div>
+              <div class="valvula-solenoide"></div>
+              <div class="conector-lateral"></div>
+              <div class="cuerpo-medio"></div>
+              <div class="cuerpo-inferior"></div>
+              <div class="boquilla"></div>
+            </div>
+
+            @if (modoInyector() === 'normal-angosto') {
+              <div class="spray-normal-angosto">
+                @for (gota of gotasActivas(); track $index) {
+                  <div class="gota-spray angosta"
+                       [style.left.%]="gota.x"
+                       [style.top.%]="gota.y"
+                       [style.opacity]="gota.opacity"
+                       [style.width.px]="gota.size"
+                       [style.height.px]="gota.size">
+                  </div>
+                }
+              </div>
+            }
+
+            @if (modoInyector() === 'normal-amplio') {
+              <div class="spray-normal-amplio">
+                @for (gota of gotasActivas(); track $index) {
+                  <div class="gota-spray amplia"
+                       [style.left.%]="gota.x"
+                       [style.top.%]="gota.y"
+                       [style.opacity]="gota.opacity"
+                       [style.width.px]="gota.size"
+                       [style.height.px]="gota.size">
+                  </div>
+                }
+              </div>
+            }
+
+            @if (modoInyector() === 'obstruido') {
+              <div class="spray-obstruido">
+                <div class="chorro-fino"></div>
+                @for (gota of gotasActivas(); track $index) {
+                  <div class="gota-obstruida"
+                       [style.left.%]="gota.x"
+                       [style.top.%]="gota.y"
+                       [style.opacity]="gota.opacity"
+                       [style.width.px]="gota.size"
+                       [style.height.px]="gota.size">
+                  </div>
+                }
+              </div>
+            }
+
+            @if (modoInyector() === 'goteo') {
+              <div class="spray-goteo">
+                @for (gota of gotasActivas(); track $index) {
+                  <div class="gota-goteo"
+                       [style.left.%]="gota.x"
+                       [style.top.%]="gota.y"
+                       [style.opacity]="gota.opacity"
+                       [style.width.px]="gota.size * 1.5"
+                       [style.height.px]="gota.size * 1.8">
+                  </div>
+                }
+                <div class="charco-combustible"></div>
+              </div>
+            }
+
+            <div class="medidor-combustible" [class.rica]="tipoMezcla() === 'rica'" [class.pobre]="tipoMezcla() === 'pobre'">
+              <div class="medidor-fill" [style.height.%]="nivelCombustible()"></div>
+              <div class="medidor-label">{{ nivelCombustible() }}%</div>
+            </div>
+          </div>
+
+          <p class="inyector-desc">
+            @if (tipoMezcla() === 'rica') {
+              💧 <strong class="text-danger">RICA:</strong> Inyecta DEMASIADO
+            } @else if (tipoMezcla() === 'pobre') {
+              💨 <strong class="text-warning">POBRE:</strong> Inyecta POCO
+            } @else {
+              ✅ <strong class="text-success">IDEAL:</strong> Cantidad óptima
+            }
+          </p>
+        </div>
+      }
+    </div>
+
+    <div class="estado-actual">
+      <span class="badge-estado-simulador" [class]="claseEstadoInyector()">
+        <i class="bi bi-circle-fill"></i>
+        Inyector: {{ textoEstadoInyector() }}
+      </span>
+      <span class="badge-estado-simulador ms-2" [class]="claseMezcla()">
+        <i class="bi bi-droplet-fill"></i>
+        Mezcla: {{ textoMezcla() }} (AFR {{ afr().toFixed(2) }}:1)
+      </span>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- CONTROLES Y RESULTADOS                        -->
+  <!-- ============================================ -->
+  <div class="row g-3">
+    <div class="col-lg-4">
+      <div class="card-panel">
+        <h5 class="panel-title"><i class="bi bi-sliders"></i> Parámetros</h5>
+
+        <div class="control-group">
+          <label class="control-label">
+            <i class="bi bi-eyedropper text-danger"></i> Modo de comportamiento
+          </label>
+          <select class="form-select" [value]="modoInyector()" (change)="modoInyector.set($any($event.target).value)">
+            <option value="normal-angosto">✅ Flujo normal (angosto)</option>
+            <option value="normal-amplio">✅ Flujo normal (amplio)</option>
+            <option value="obstruido">⚠️ Flujo obstruido</option>
+            <option value="goteo">❌ Goteo</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">
+            <i class="bi bi-gear-fill text-info"></i> Estado del inyector
+          </label>
+          <select class="form-select" [value]="estadoInyector()" (change)="estadoInyector.set($any($event.target).value)">
+            <option value="bueno">✅ Bueno (limpio)</option>
+            <option value="sucio">⚠️ Sucio (obstruido)</option>
+            <option value="dañado">❌ Dañado (goteando)</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">
+            <i class="bi bi-geo-alt-fill text-danger"></i> Altitud
+            <span class="valor-actual">{{ altitud() | number }} m</span>
+          </label>
+          <input type="range" class="form-range" min="0" max="5000" step="100"
+                 [value]="altitud()"
+                 (input)="altitud.set(+$any($event.target).value)" />
+          <div class="presets">
+            <button class="btn-preset" (click)="altitud.set(0)">Cochabamba</button>
+            <button class="btn-preset" (click)="altitud.set(400)">Santa Cruz</button>
+            <button class="btn-preset" (click)="altitud.set(2500)">Sucre</button>
+            <button class="btn-preset" (click)="altitud.set(3600)">La Paz</button>
+            <button class="btn-preset" (click)="altitud.set(4100)">El Alto</button>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">
+            <i class="bi bi-fuel-pump-fill text-warning"></i> Calidad de gasolina
+          </label>
+          <select class="form-select" [value]="calidadGasolina()" (change)="calidadGasolina.set($any($event.target).value)">
+            <option value="premium">Premium (95 octanos)</option>
+            <option value="regular">Regular (87 octanos)</option>
+            <option value="mala">Mala (con agua/impurezas)</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">
+            <i class="bi bi-radar text-success"></i> Sensor de oxígeno
+          </label>
+          <select class="form-select" [value]="estadoSensor()" (change)="estadoSensor.set($any($event.target).value)">
+            <option value="ok">OK (funcionando)</option>
+            <option value="lento">Lento (respuesta tardía)</option>
+            <option value="falla">Falla total</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">
+            <i class="bi bi-thermometer-half text-danger"></i> Temperatura motor
+            <span class="valor-actual">{{ temperatura() }}°C</span>
+          </label>
+          <input type="range" class="form-range" min="0" max="120" step="5"
+                 [value]="temperatura()"
+                 (input)="temperatura.set(+$any($event.target).value)" />
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-8">
+      <div class="card-panel">
+        <h5 class="panel-title"><i class="bi bi-graph-up"></i> Resultados</h5>
+
+        <div class="row g-3">
+          <div class="col-md-4">
+            <div class="stat-mini">
+              <div class="stat-label">Mezcla Aire/Combustible</div>
+              <div class="stat-value" [class]="claseAFR()">{{ afr().toFixed(2) }}:1</div>
+              <small class="text-muted">{{ textoAFR() }}</small>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="stat-mini">
+              <div class="stat-label">Potencia estimada</div>
+              <div class="stat-value" [class]="clasePotencia()">{{ potencia().toFixed(1) }} HP</div>
+              <small class="text-muted">{{ textoPotencia() }}</small>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="stat-mini">
+              <div class="stat-label">Consumo</div>
+              <div class="stat-value">{{ consumo().toFixed(2) }} L/100km</div>
+              <small class="text-muted">{{ textoConsumo() }}</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-3">
+          <div class="d-flex justify-content-between mb-1">
+            <small class="text-muted">Eficiencia del sistema</small>
+            <small class="text-muted">{{ eficiencia().toFixed(0) }}%</small>
+          </div>
+          <div class="progress-bar-custom">
+            <div class="progress-fill" [style.width.%]="eficiencia()" [class]="claseEficiencia()"></div>
+          </div>
+        </div>
+
+        <h6 class="mt-4 mb-2 text-muted text-uppercase" style="font-size: 0.75rem; letter-spacing: 1px;">
+          Datos calculados
+        </h6>
+        <table class="tabla-datos">
+          <tr><td>Presión atmosférica</td><td class="text-end">{{ presionAtmosferica().toFixed(2) }} kPa</td></tr>
+          <tr><td>Oxígeno disponible</td><td class="text-end">{{ oxigenoDisponible().toFixed(1) }}%</td></tr>
+          <tr><td>Densidad del aire</td><td class="text-end">{{ densidadAire().toFixed(3) }} kg/m³</td></tr>
+          <tr><td>Duración de inyección</td><td class="text-end">{{ duracionInyeccion().toFixed(2) }} ms</td></tr>
+          <tr><td>Volumen de combustible</td><td class="text-end">{{ volumenCombustible().toFixed(2) }} mg</td></tr>
+          <tr><td>Corrección ECU</td><td class="text-end">{{ correccionECU().toFixed(1) }}%</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIAGNÓSTICO -->
+  <div class="row g-3 mt-3">
+    <div class="col-lg-6">
+      <div class="card-panel">
+        <h5 class="panel-title"><i class="bi bi-clipboard-pulse"></i> Diagnóstico</h5>
+        @if (diagnosticos().length === 0) {
+          <p class="text-success mb-0">
+            <i class="bi bi-check-circle-fill"></i> Sistema funcionando correctamente
+          </p>
+        } @else {
+          <ul class="lista-diagnosticos">
+            @for (d of diagnosticos(); track $index) {
+              <li [class]="'diag-' + d.tipo">
+                <i class="bi" [class]="'bi-' + d.icono"></i>
+                <div>
+                  <strong>{{ d.titulo }}</strong>
+                  <p class="mb-0">{{ d.descripcion }}</p>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="card-panel">
+        <h5 class="panel-title"><i class="bi bi-lightbulb-fill text-warning"></i> Recomendaciones</h5>
+        @if (recomendaciones().length === 0) {
+          <p class="text-muted mb-0">Sin recomendaciones por ahora.</p>
+        } @else {
+          <ul class="lista-recomendaciones">
+            @for (r of recomendaciones(); track $index) {
+              <li>
+                <i class="bi bi-arrow-right-circle-fill text-danger"></i>
+                {{ r }}
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    </div>
+  </div>
+</div>
