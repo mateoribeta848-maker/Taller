@@ -16,6 +16,8 @@ export class MainLayoutComponent {
   menuItems = [
     { path: '/dashboard',      icon: 'bi-speedometer2',         label: 'Dashboard' },
     { path: '/clientes',       icon: 'bi-people-fill',          label: 'Clientes' },
+    { path: '/personal',       icon: 'bi-person-badge-fill',     label: 'Personal / Encargados' },
+    { path: '/finanzas',       icon: 'bi-cash-stack',            label: 'Finanzas' },
     { path: '/repuestos',      icon: 'bi-tools',                label: 'Repuestos' },
     { path: '/carros',         icon: 'bi-car-front-fill',       label: 'Tipos de Carros' },
     { path: '/mantenimiento',  icon: 'bi-calendar-check',       label: 'Mantenimiento' },

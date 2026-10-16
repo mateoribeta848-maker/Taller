@@ -541,3 +541,98 @@ body:has(.factura-page) .main-content,
 body:has(.informe-page) .main-content {
   margin-left: 0 !important;
 }
+
+@media print {
+  body.printing-personal-credential * {
+    visibility: hidden !important;
+  }
+
+  body.printing-personal-credential .modal-custom,
+  body.printing-personal-credential .modal-custom * {
+    visibility: visible !important;
+  }
+
+  body.printing-personal-credential .modal-backdrop-custom,
+  body.printing-personal-credential .modal-header,
+  body.printing-personal-credential .modal-footer,
+  body.printing-personal-credential .personal-form-panel,
+  body.printing-personal-credential .preview-label,
+  body.printing-personal-credential .print-button {
+    display: none !important;
+  }
+
+  body.printing-personal-credential .modal-custom {
+    position: absolute;
+    inset: 0;
+    display: block;
+    overflow: visible;
+    padding: 0;
+  }
+
+  body.printing-personal-credential .personnel-modal,
+  body.printing-personal-credential .modal-body {
+    width: auto;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    background: transparent !important;
+    border: 0;
+    box-shadow: none;
+  }
+
+  body.printing-personal-credential .modal-grid {
+    display: block;
+  }
+
+  @page {
+    margin: 12mm;
+  }
+}
+
+@media print {
+  body.printing-finance-receipt * {
+    visibility: hidden !important;
+  }
+
+  body.printing-finance-receipt .receipt-modal,
+  body.printing-finance-receipt .receipt-modal * {
+    visibility: visible !important;
+  }
+
+  body.printing-finance-receipt .modal-backdrop-custom,
+  body.printing-finance-receipt .no-receipt-print {
+    display: none !important;
+  }
+
+  body.printing-finance-receipt .modal-custom {
+    position: absolute;
+    inset: 0;
+    display: block;
+    overflow: visible;
+    padding: 0;
+  }
+
+  body.printing-finance-receipt .receipt-modal,
+  body.printing-finance-receipt .receipt-modal .modal-body {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    max-height: none;
+    overflow: visible;
+    background: transparent !important;
+    border: 0;
+    box-shadow: none;
+  }
+
+  body.printing-finance-receipt .cash-receipt {
+    width: 100%;
+    max-width: 105mm;
+    margin: 0 auto;
+    border: 0;
+  }
+
+  @page {
+    margin: 12mm;
+  }
+}

@@ -1,0 +1,323 @@
+.personal-page {
+  min-width: 0;
+}
+
+.card-table {
+  overflow: hidden;
+  background: #1c1c20;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 20px;
+  color: #fff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.card-header h4 {
+  font-size: 1.15rem;
+}
+
+.toolbar,
+.person-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.search-input {
+  width: 240px;
+}
+
+.search-input .input-group-text,
+.search-input .form-control {
+  background: #25252a;
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.search-input .form-control::placeholder {
+  color: #999;
+}
+
+.person-avatar {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.initials {
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: #37373e;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.person-name {
+  color: #fff;
+  font-weight: 600;
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 5px 10px;
+  color: #ffb5b5;
+  background: rgba(211, 47, 47, 0.16);
+  border: 1px solid rgba(211, 47, 47, 0.35);
+  border-radius: 30px;
+  font-size: 0.8rem;
+}
+
+.empty-state {
+  padding: 48px 20px !important;
+  color: #aaa !important;
+  text-align: center;
+}
+
+.empty-state i {
+  margin-bottom: 10px;
+  font-size: 2rem;
+}
+
+.storage-note {
+  padding: 12px 20px;
+  color: #a8a8ad;
+  background: rgba(255, 255, 255, 0.025);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 0.82rem;
+}
+
+.storage-note i {
+  margin-right: 5px;
+}
+
+.modal-custom {
+  overflow-y: auto;
+  align-items: flex-start;
+}
+
+.personnel-modal {
+  max-width: 980px;
+  margin: auto;
+}
+
+.modal-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(290px, 0.85fr);
+  gap: 24px;
+}
+
+.modal-grid.preview-only {
+  display: flex;
+  justify-content: center;
+}
+
+.personal-form-panel .form-control,
+.personal-form-panel .form-select {
+  background: #2a2a2f;
+  border-color: rgba(255, 255, 255, 0.14);
+  color: #fff !important;
+  font-size: 1rem;
+  font-weight: 500;
+  min-height: 44px;
+}
+
+.personal-form-panel .form-control::placeholder {
+  color: #b8b8c0;
+  opacity: 1;
+}
+
+.personal-form-panel .form-control:focus,
+.personal-form-panel .form-select:focus {
+  border-color: #d32f2f;
+  box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.15);
+  color: #fff !important;
+}
+
+.personal-form-panel .form-select option {
+  color: #fff;
+  background: #1c1c20;
+}
+
+.preview-label {
+  margin: 0 0 10px;
+  color: #bcbcc2;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.credential-card {
+  width: 100%;
+  max-width: 360px;
+  aspect-ratio: 1.586 / 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  padding: 14px;
+  color: #24242a;
+  background: linear-gradient(135deg, #fff 0%, #f0f0f2 100%);
+  border: 1px solid #dedee2;
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+}
+
+.credential-top {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.credential-logo {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+}
+
+.credential-top > div {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.credential-top > div strong {
+  color: #202027;
+  font-size: 0.92rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+}
+
+.credential-top > div small {
+  margin-top: 3px;
+  color: #4c4c55;
+  font-size: 0.56rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+.credential-role {
+  margin-left: auto;
+  padding: 4px 7px;
+  color: #a91f25;
+  background: #fae7e8;
+  border-radius: 20px;
+  font-size: 0.54rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.credential-main {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-height: 0;
+}
+
+.credential-photo {
+  width: 68px;
+  height: 82px;
+  flex: 0 0 68px;
+  border: 2px solid #d32f2f;
+  border-radius: 7px;
+  object-fit: cover;
+}
+
+.photo-placeholder {
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: #3b3b42;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.credential-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 4px;
+}
+
+.credential-info strong {
+  color: #202027;
+  font-size: 0.95rem;
+  font-weight: 800;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.credential-info span {
+  color: #9e1f25;
+  font-size: 0.56rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.credential-info small {
+  color: #414149;
+  font-size: 0.68rem;
+  font-weight: 500;
+}
+
+.credential-bottom {
+  padding-top: 6px;
+  color: #818188;
+  border-top: 1px solid #dedee2;
+  font-size: 0.47rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-align: center;
+}
+
+.print-button {
+  display: block;
+  margin: 14px auto 0;
+}
+
+@media (max-width: 760px) {
+  .card-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .toolbar {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .search-input {
+    flex: 1 1 180px;
+    width: auto;
+  }
+
+  .modal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .credential-preview {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+  }
+}
+
+@media print {
+  .credential-card {
+    width: 85.6mm;
+    height: 54mm;
+    max-width: none;
+    margin: 0;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}

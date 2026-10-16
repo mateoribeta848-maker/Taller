@@ -1,0 +1,233 @@
+<section class="finance-page">
+  <div class="finance-heading">
+    <div>
+      <h4><i class="bi bi-cash-stack text-danger"></i> Finanzas</h4>
+      <p>Registro de cobros de trabajos realizados. La factura se mantiene independiente del recibo.</p>
+    </div>
+    <button class="btn btn-outline-light" type="button" (click)="cargar()" [disabled]="cargando()">
+      <i class="bi bi-arrow-clockwise"></i> Actualizar
+    </button>
+  </div>
+
+  @if (mensaje()) {
+    <div class="alert alert-success" role="status">
+      <i class="bi bi-check-circle"></i> {{ mensaje() }}
+      <button class="btn-close float-end" type="button" aria-label="Cerrar" (click)="mensaje.set(null)"></button>
+    </div>
+  }
+
+  @if (error() && !trabajoSeleccionado()) {
+    <div class="alert alert-danger" role="alert">{{ error() }}</div>
+  }
+
+  <div class="summary-grid">
+    <article class="summary-card">
+      <span class="summary-icon collected"><i class="bi bi-wallet2"></i></span>
+      <div><small>Total cobrado</small><strong>{{ formatearBs(totalCobrado) }}</strong></div>
+    </article>
+    <article class="summary-card">
+      <span class="summary-icon pending"><i class="bi bi-hourglass-split"></i></span>
+      <div><small>Por cobrar</small><strong>{{ formatearBs(totalPendiente) }}</strong></div>
+    </article>
+    <article class="summary-card">
+      <span class="summary-icon jobs"><i class="bi bi-receipt"></i></span>
+      <div><small>Trabajos pendientes de pago</small><strong>{{ cantidadPendiente }}</strong></div>
+    </article>
+  </div>
+
+  <div class="finance-table card-table">
+    <div class="card-header">
+      <div>
+        <h5 class="m-0">Cobros por trabajo</h5>
+        <small class="text-muted">Los importes se toman del total calculado en cada trabajo</small>
+      </div>
+      <div class="input-group finance-search">
+        <span class="input-group-text"><i class="bi bi-search"></i></span>
+        <input class="form-control" type="search" placeholder="Factura, cliente o vehículo..."
+          [value]="busqueda()" (input)="busqueda.set($any($event.target).value)" />
+      </div>
+    </div>
+
+    @if (cargando()) {
+      <div class="text-center p-5">
+        <div class="spinner-border text-danger" role="status"></div>
+        <p class="mt-2 text-muted">Cargando finanzas...</p>
+      </div>
+    } @else if (!error()) {
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>Factura / Cliente</th>
+              <th>Vehículo</th>
+              <th class="text-end">Monto</th>
+              <th>Pago</th>
+              <th>Fecha de pago</th>
+              <th class="text-center">Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (trabajo of trabajosFiltrados; track trabajo.trabajo_id) {
+              <tr>
+                <td>
+                  <strong class="invoice-number">{{ trabajo.numero_factura }}</strong>
+                  <small class="d-block text-muted">{{ trabajo.cliente_nombre }}</small>
+                </td>
+                <td>{{ trabajo.carro || '—' }}</td>
+                <td class="text-end fw-bold">{{ formatearBs(trabajo.total) }}</td>
+                <td>
+                  @if (trabajo.pago_id) {
+                    <span class="payment-badge paid"><i class="bi bi-check-circle"></i> {{ metodoTexto(trabajo.metodo_pago) }}</span>
+                    @if (trabajo.ultimos_digitos) {
+                      <small class="d-block text-muted">•••• {{ trabajo.ultimos_digitos }}</small>
+                    }
+                    @if (trabajo.numero_recibo) {
+                      <small class="d-block text-muted">{{ trabajo.numero_recibo }}</small>
+                    }
+                  } @else {
+                    <span class="payment-badge unpaid">Pendiente</span>
+                  }
+                </td>
+                <td>{{ fechaLegible(trabajo.fecha_pago) }}</td>
+                <td class="text-center text-nowrap">
+                  @if (trabajo.pago_id && trabajo.numero_recibo) {
+                    <button class="btn btn-sm btn-outline-light" type="button" title="Ver/imprimir recibo"
+                      (click)="abrirRecibo(trabajo)">
+                      <i class="bi bi-printer"></i><span class="visually-hidden">Ver recibo</span>
+                    </button>
+                  } @else if (!trabajo.pago_id) {
+                    <button class="btn btn-sm btn-primary" type="button" (click)="abrirCobro(trabajo)">
+                      <i class="bi bi-credit-card"></i> Cobrar
+                    </button>
+                  }
+                </td>
+              </tr>
+            } @empty {
+              <tr><td colspan="6" class="text-center text-muted py-5">
+                No hay trabajos que coincidan con la búsqueda.
+              </td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</section>
+
+@if (trabajoSeleccionado(); as trabajo) {
+  <div class="modal-backdrop-custom" (click)="cerrarCobro()"></div>
+  <div class="modal-custom">
+    <div class="modal-content finance-modal">
+      <div class="modal-header bg-danger text-white">
+        <div>
+          <h5 class="modal-title"><i class="bi bi-cash-coin"></i> Registrar cobro</h5>
+          <small class="opacity-75">{{ trabajo.numero_factura }} · {{ trabajo.cliente_nombre }}</small>
+        </div>
+        <button class="btn-close btn-close-white" type="button" aria-label="Cerrar" (click)="cerrarCobro()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="amount-due">
+          <span>Monto a pagar</span>
+          <strong>{{ formatearBs(trabajo.total) }}</strong>
+        </div>
+        <label class="form-label">Selecciona el método de pago</label>
+        <div class="method-options">
+          <button type="button" class="method-option" [class.selected]="metodo() === 'efectivo'" (click)="seleccionarMetodo('efectivo')">
+            <i class="bi bi-cash"></i><span>Efectivo</span>
+          </button>
+          <button type="button" class="method-option" [class.selected]="metodo() === 'tarjeta'" (click)="seleccionarMetodo('tarjeta')">
+            <i class="bi bi-credit-card"></i><span>Tarjeta</span>
+          </button>
+          <button type="button" class="method-option" [class.selected]="metodo() === 'qr'" (click)="seleccionarMetodo('qr')">
+            <i class="bi bi-qr-code"></i><span>QR</span>
+          </button>
+        </div>
+
+        @if (metodo() === 'efectivo') {
+          <div class="method-note">
+            <i class="bi bi-info-circle"></i>
+            Al registrar el efectivo se emitirá un recibo de pago imprimible, separado de la factura.
+          </div>
+        } @else if (metodo() === 'tarjeta') {
+          <div class="card-payment-fields">
+            <div class="alert alert-warning">
+              Registro manual: el cobro debe procesarse en el POS. No ingreses ni guardes el número completo o CVV.
+            </div>
+            <label for="last-four" class="form-label">Últimos 4 dígitos *</label>
+            <input id="last-four" class="form-control" type="text" inputmode="numeric" maxlength="4"
+              autocomplete="off" placeholder="1234" [ngModel]="ultimosDigitos()"
+              (ngModelChange)="actualizarUltimosDigitos($event)" />
+            <label for="card-reference" class="form-label mt-3">Referencia del POS (opcional)</label>
+            <input id="card-reference" class="form-control" type="text" maxlength="100"
+              [ngModel]="referenciaTarjeta()" (ngModelChange)="referenciaTarjeta.set($event)" />
+          </div>
+        } @else {
+          <div class="qr-demo-panel">
+            <div class="alert alert-warning">
+              Este es un QR aleatorio de demostración; no está conectado a un banco y no recibe pagos.
+              Confirma el cobro por fuera antes de registrarlo.
+            </div>
+            <div class="qr-payment-card">
+              <img class="qr-workshop-logo" src="/demoncar-logo.png" alt="Logo DemonCar" />
+              <div><small>Monto a pagar</small><strong>{{ formatearBs(trabajo.total) }}</strong></div>
+              @if (imagenQr()) {
+                <img class="qr-image" [src]="imagenQr()" alt="QR aleatorio de demostración" />
+              } @else {
+                <div class="qr-loading"><span class="spinner-border spinner-border-sm"></span> Generando QR...</div>
+              }
+              <small class="qr-reference">Ref: {{ referenciaQr() }}</small>
+            </div>
+            @if (errorQr()) { <div class="text-danger small mt-2">{{ errorQr() }}</div> }
+            <button class="btn btn-sm btn-outline-light mt-3" type="button" (click)="generarQr()">
+              <i class="bi bi-arrow-repeat"></i> Generar otro QR
+            </button>
+          </div>
+        }
+
+        @if (error()) { <div class="alert alert-danger mt-3 mb-0" role="alert">{{ error() }}</div> }
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" (click)="cerrarCobro()" [disabled]="guardando()">Cancelar</button>
+        <button class="btn btn-primary" type="button" (click)="confirmarPago()" [disabled]="guardando() || (metodo() === 'qr' && !imagenQr())">
+          @if (guardando()) { <span class="spinner-border spinner-border-sm me-1"></span> }
+          Registrar pago recibido
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (pagoRecibo(); as pago) {
+  <div class="modal-backdrop-custom" (click)="cerrarRecibo()"></div>
+  <div class="modal-custom">
+    <div class="modal-content receipt-modal">
+      <div class="modal-header bg-danger text-white no-receipt-print">
+        <h5 class="modal-title"><i class="bi bi-receipt"></i> Recibo de pago en efectivo</h5>
+        <button class="btn-close btn-close-white" type="button" aria-label="Cerrar" (click)="cerrarRecibo()"></button>
+      </div>
+      <div class="modal-body">
+        <article class="cash-receipt">
+          <header class="receipt-header">
+            <img src="/demoncar-logo.png" alt="DemonCar" />
+            <div><strong>DemonCar</strong><small>Taller Automotriz Especializado</small></div>
+          </header>
+          <div class="receipt-title">RECIBO DE PAGO</div>
+          <div class="receipt-number">{{ pago.numero_recibo }}</div>
+          <div class="receipt-rule"></div>
+          <div class="receipt-row"><span>Fecha</span><strong>{{ fechaLegible(pago.fecha_pago) }}</strong></div>
+          <div class="receipt-row"><span>Recibimos de</span><strong>{{ pago.cliente_nombre }}</strong></div>
+          <div class="receipt-row"><span>Por concepto de</span><strong>Pago de trabajo {{ pago.numero_factura }}</strong></div>
+          <div class="receipt-row"><span>Factura relacionada</span><strong>{{ pago.numero_factura }}</strong></div>
+          <div class="receipt-row"><span>Método</span><strong>Efectivo</strong></div>
+          <div class="receipt-total"><span>TOTAL RECIBIDO</span><strong>{{ formatearBs(pago.monto ?? pago.monto_pagado) }}</strong></div>
+          <p class="receipt-footnote">Este recibo acredita el pago y es independiente de la factura del trabajo.</p>
+          <div class="receipt-signature">Firma / sello</div>
+        </article>
+      </div>
+      <div class="modal-footer no-receipt-print">
+        <button class="btn btn-secondary" type="button" (click)="cerrarRecibo()">Cerrar</button>
+        <button class="btn btn-primary" type="button" (click)="imprimirRecibo()"><i class="bi bi-printer"></i> Imprimir recibo</button>
+      </div>
+    </div>
+  </div>
+}

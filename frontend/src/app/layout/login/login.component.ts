@@ -14,8 +14,8 @@ export class LoginComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
 
-  email = 'admin@taller.com';
-  password = 'admin123';
+  email = '';
+  password = '';
 
   cargando = signal(false);
   error = signal<string | null>(null);

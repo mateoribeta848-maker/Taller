@@ -1,0 +1,205 @@
+<section class="personal-page">
+  <div class="card-table">
+    <div class="card-header">
+      <div>
+        <h4 class="m-0"><i class="bi bi-person-badge-fill text-danger"></i> Personal / Encargados</h4>
+        <small class="text-muted">Administra el equipo y prepara sus credenciales</small>
+      </div>
+      <div class="toolbar">
+        <div class="input-group search-input">
+          <span class="input-group-text"><i class="bi bi-search"></i></span>
+          <input
+            class="form-control"
+            type="search"
+            placeholder="Buscar personal..."
+            [value]="busqueda()"
+            (input)="busqueda.set($any($event.target).value)"
+          />
+        </div>
+        <button class="btn btn-primary" type="button" (click)="abrirNuevo()">
+          <i class="bi bi-person-plus-fill"></i> Agregar personal
+        </button>
+      </div>
+    </div>
+
+    @if (error() && !mostrarFormulario()) {
+      <div class="alert alert-danger m-3" role="alert">{{ error() }}</div>
+    }
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th>Personal</th>
+            <th>N.º de carnet</th>
+            <th>Teléfono</th>
+            <th>Rol</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (persona of personalFiltrado; track persona.id) {
+            <tr>
+              <td>
+                <div class="person-cell">
+                  @if (persona.foto) {
+                    <img class="person-avatar" [src]="persona.foto" alt="Foto de {{ persona.nombre }}" />
+                  } @else {
+                    <span class="person-avatar initials">{{ iniciales(persona.nombre, persona.apellido) }}</span>
+                  }
+                  <span class="person-name">{{ persona.nombre }} {{ persona.apellido }}</span>
+                </div>
+              </td>
+              <td>{{ persona.carnet }}</td>
+              <td>{{ persona.telefono }}</td>
+              <td><span class="role-badge">{{ persona.rol }}</span></td>
+              <td class="text-center actions-cell">
+                <button class="btn btn-sm btn-outline-light me-1" type="button" title="Previsualizar e imprimir"
+                  (click)="previsualizar(persona)">
+                  <i class="bi bi-person-vcard"></i><span class="visually-hidden">Previsualizar credencial</span>
+                </button>
+                <button class="btn btn-sm btn-outline-warning me-1" type="button" title="Editar"
+                  (click)="editar(persona)">
+                  <i class="bi bi-pencil"></i><span class="visually-hidden">Editar</span>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" type="button" title="Eliminar"
+                  (click)="eliminar(persona)">
+                  <i class="bi bi-trash"></i><span class="visually-hidden">Eliminar</span>
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="empty-state">
+                <i class="bi bi-people d-block"></i>
+                @if (busqueda()) {
+                  No se encontró personal que coincida con "{{ busqueda() }}".
+                } @else {
+                  Aún no hay personal registrado. Agrega el primer integrante del equipo.
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="storage-note">
+      <i class="bi bi-info-circle"></i>
+      Los registros se guardan en este navegador y no se sincronizan con otros dispositivos.
+    </div>
+  </div>
+</section>
+
+@if (mostrarFormulario()) {
+  <div class="modal-backdrop-custom" (click)="cerrarFormulario()"></div>
+  <div class="modal-custom">
+    <div class="modal-content personnel-modal">
+      <div class="modal-header bg-danger text-white">
+        <div>
+          <h5 class="modal-title">
+            <i class="bi" [class]="soloVistaPrevia() ? 'bi-person-vcard' : editandoId() ? 'bi-pencil-square' : 'bi-person-plus'"></i>
+            {{ soloVistaPrevia() ? 'Vista previa de credencial' : editandoId() ? 'Editar personal' : 'Nuevo integrante' }}
+          </h5>
+          @if (!soloVistaPrevia()) {
+            <small class="opacity-75">Completa los datos para generar la credencial</small>
+          }
+        </div>
+        <button type="button" class="btn-close btn-close-white" aria-label="Cerrar" (click)="cerrarFormulario()"></button>
+      </div>
+
+      <div class="modal-body">
+        @if (error()) {
+          <div class="alert alert-danger" role="alert">{{ error() }}</div>
+        }
+        <div class="modal-grid" [class.preview-only]="soloVistaPrevia()">
+          @if (!soloVistaPrevia()) {
+            <div class="personal-form-panel">
+              <div class="row g-3">
+                <div class="col-sm-6">
+                  <label for="nombre" class="form-label">Nombres *</label>
+                  <input id="nombre" class="form-control" type="text" [(ngModel)]="formulario.nombre"
+                    autocomplete="given-name" placeholder="Ej. Juan Carlos" />
+                </div>
+                <div class="col-sm-6">
+                  <label for="apellido" class="form-label">Apellidos *</label>
+                  <input id="apellido" class="form-control" type="text" [(ngModel)]="formulario.apellido"
+                    autocomplete="family-name" placeholder="Ej. Pérez" />
+                </div>
+                <div class="col-sm-6">
+                  <label for="carnet" class="form-label">N.º de carnet *</label>
+                  <input id="carnet" class="form-control" type="text" [(ngModel)]="formulario.carnet"
+                    autocomplete="off" placeholder="Ej. 1234567" />
+                </div>
+                <div class="col-sm-6">
+                  <label for="telefono" class="form-label">Teléfono *</label>
+                  <input id="telefono" class="form-control" type="tel" [(ngModel)]="formulario.telefono"
+                    autocomplete="tel" placeholder="Ej. 70012345" />
+                </div>
+                <div class="col-12">
+                  <label for="rol" class="form-label">Rol *</label>
+                  <select id="rol" class="form-select" [(ngModel)]="formulario.rol">
+                    @for (rol of roles; track rol) {
+                      <option [ngValue]="rol">{{ rol }}</option>
+                    }
+                  </select>
+                </div>
+                <div class="col-12">
+                  <label for="foto" class="form-label">Foto <span class="text-muted">(opcional, máximo 1 MB)</span></label>
+                  <input id="foto" class="form-control" type="file" accept="image/*" (change)="seleccionarFoto($event)" />
+                  @if (formulario.foto) {
+                    <button class="btn btn-sm btn-link text-danger px-0 mt-1" type="button" (click)="quitarFoto()">
+                      Quitar foto
+                    </button>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+
+          <div class="credential-preview">
+            @if (!soloVistaPrevia()) {
+              <p class="preview-label"><i class="bi bi-eye"></i> Vista previa de credencial</p>
+            }
+            <article class="credential-card">
+              <div class="credential-top">
+                <img src="/demoncar-logo.png" alt="" class="credential-logo" />
+                <div><strong>DEMONCAR</strong><small>TALLER AUTOMOTRIZ</small></div>
+                <span class="credential-role">{{ formulario.rol }}</span>
+              </div>
+              <div class="credential-main">
+                @if (formulario.foto) {
+                  <img class="credential-photo" [src]="formulario.foto" alt="Foto del integrante" />
+                } @else {
+                  <span class="credential-photo photo-placeholder">
+                    {{ formulario.nombre || formulario.apellido ? iniciales(formulario.nombre || '?', formulario.apellido || '?') : '?' }}
+                  </span>
+                }
+                <div class="credential-info">
+                  <strong>{{ formulario.nombre || 'Nombres' }} {{ formulario.apellido || 'Apellidos' }}</strong>
+                  <span>PERSONAL AUTORIZADO</span>
+                  <small>CI: {{ formulario.carnet || '—' }}</small>
+                  <small>Tel: {{ formulario.telefono || '—' }}</small>
+                </div>
+              </div>
+              <div class="credential-bottom">IDENTIFICACIÓN DEL PERSONAL</div>
+            </article>
+            <button type="button" class="btn btn-outline-light btn-sm print-button" (click)="imprimirCredencial()">
+              <i class="bi bi-printer"></i> Imprimir credencial
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        @if (soloVistaPrevia()) {
+          <button class="btn btn-secondary" type="button" (click)="cerrarFormulario()">Cerrar</button>
+        } @else {
+          <button class="btn btn-secondary" type="button" (click)="cerrarFormulario()">Cancelar</button>
+          <button class="btn btn-primary" type="button" (click)="guardar()">
+            <i class="bi bi-check-lg"></i> {{ editandoId() ? 'Guardar cambios' : 'Guardar personal' }}
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+}
