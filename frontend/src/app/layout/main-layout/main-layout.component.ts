@@ -13,14 +13,15 @@ export class MainLayoutComponent {
   authService = inject(AuthService);
   hoy = new Date();
 
-  menuItems = [
-  { path: '/dashboard',     icon: 'bi-speedometer2',       label: 'Dashboard' },
-  { path: '/clientes',      icon: 'bi-people-fill',        label: 'Clientes' },
-  { path: '/repuestos',     icon: 'bi-tools',              label: 'Repuestos' },
-  { path: '/carros',        icon: 'bi-car-front-fill',     label: 'Tipos de Carros' },
-  { path: '/mantenimiento', icon: 'bi-calendar-check',     label: 'Mantenimiento' },
-  { path: '/tipos-trabajos', icon: 'bi-list-check',        label: 'Tipos de Trabajos' },
-  { path: '/trabajos',      icon: 'bi-wrench-adjustable',  label: 'Trabajos' },
+ menuItems = [
+  { path: '/dashboard',      icon: 'bi-speedometer2',        label: 'Dashboard' },
+  { path: '/clientes',       icon: 'bi-people-fill',         label: 'Clientes' },
+  { path: '/repuestos',      icon: 'bi-tools',               label: 'Repuestos' },
+  { path: '/carros',         icon: 'bi-car-front-fill',      label: 'Tipos de Carros' },
+  { path: '/mantenimiento',  icon: 'bi-calendar-check',      label: 'Mantenimiento' },
+  { path: '/tipos-trabajos', icon: 'bi-list-check',          label: 'Tipos de Trabajos' },
+  { path: '/ordenes',        icon: 'bi-clipboard-check-fill', label: 'Órdenes de Trabajo' },
+  { path: '/trabajos',       icon: 'bi-wrench-adjustable',   label: 'Trabajos' },
 ];
   cerrarSesion() {
     if (confirm('¿Cerrar sesión?')) {

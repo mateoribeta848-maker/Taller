@@ -21,11 +21,12 @@ app.use('/api/clientes', require('./routes/clientes.routes'));
 app.use('/api/repuestos', require('./routes/repuestos.routes'));
 app.use('/api/carros', require('./routes/carros.routes'));
 app.use('/api/mantenimiento', require('./routes/mantenimiento.routes'));
-app.use('/api/trabajos', require('./routes/trabajos.routes'));
 app.use('/api/tipos-trabajos', require('./routes/tipos-trabajos.routes'));
 app.use('/api/categorias-repuestos', require('./routes/categorias-repuestos.routes'));
+app.use('/api/trabajos', require('./routes/trabajos.routes'));
 app.use('/api/informes', require('./routes/informes.routes'));
 app.use('/api/detalle-trabajos', require('./routes/detalle-trabajos.routes'));
+app.use('/api/ordenes', require('./routes/ordenes.routes'));
 
 // ============================================
 // RUTA RAÍZ

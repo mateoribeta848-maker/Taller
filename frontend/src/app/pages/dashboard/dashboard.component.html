@@ -8,7 +8,7 @@
       ¡Bienvenido, {{ authService.usuario()?.nombre }}!
     </h3>
     <p class="mb-0 text-muted">
-      Resumen general del taller de frenos
+      Resumen general de DemonCar - Taller Automotriz
     </p>
   </div>
   <div class="text-end">
@@ -101,17 +101,17 @@
       <div class="card-ingreso">
         <div class="d-flex justify-content-between align-items-center">
           <div>
-            <div class="stat-label text-uppercase" style="color: #616161;">
+            <div class="stat-label text-uppercase" style="color: #9e9e9e;">
               <i class="bi bi-cash-coin"></i> Ingresos del mes
             </div>
-            <h1 class="m-0 text-success mt-2">
+            <h1 class="m-0 mt-2" style="color: #81c784 !important;">
               {{ formatearBs(estadisticas()?.ingresosMes) }}
             </h1>
             <small class="text-muted">
               Basado en trabajos finalizados
             </small>
           </div>
-          <i class="bi bi-graph-up-arrow" style="font-size: 5rem; color: #e8f5e9;"></i>
+          <i class="bi bi-graph-up-arrow" style="font-size: 5rem; color: rgba(129, 199, 132, 0.15);"></i>
         </div>
       </div>
     </div>

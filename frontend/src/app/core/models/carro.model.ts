@@ -3,6 +3,10 @@ export interface Carro {
   marca: string;
   modelo: string;
   anio: number;
-  tipo_freno: string;
+  placa: string;
+  kilometraje: number;
+  nivel_combustible: string;
+  tiene_abolladuras: boolean;
+  descripcion_abolladuras: string;
   created_at?: string;
 }

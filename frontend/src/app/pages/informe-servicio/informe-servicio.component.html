@@ -37,75 +37,112 @@
 
   @if (!cargando() && informe()) {
     <div class="informe-container">
-      <!-- ENCABEZADO -->
+
+      <!-- ============================================ -->
+      <!-- ENCABEZADO                                    -->
+      <!-- ============================================ -->
       <div class="informe-header">
         <div>
-          <h1 class="m-0"><i class="bi bi-gear-fill text-danger"></i> DemonCar</h1>
-          <p class="text-muted mb-0">Taller Automotriz Especializado</p>
-          <small class="text-muted">Santa Cruz, Bolivia</small>
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 4px;">
+            <img src="/demoncar-logo.png" alt="DemonCar" style="width: 45px; height: 45px; object-fit: contain; flex-shrink: 0;" />
+            <h1 style="font-size: 1.75rem; font-weight: 800; color: #1a1a1a; letter-spacing: -0.5px; margin: 0;">DemonCar</h1>
+          </div>
+          <p style="color: #666666; font-size: 0.9rem; margin-bottom: 2px;">Taller Automotriz Especializado</p>
+          <small style="color: #888888; font-size: 0.85rem;">La Paz, Bolivia</small>
         </div>
-        <div class="text-end">
-          <h3 class="text-danger mb-1">INFORME DE SERVICIO</h3>
-          <p class="mb-0"><strong>Factura:</strong> {{ informe()!.informe.numero_factura }}</p>
-          <p class="mb-0"><strong>Fecha ingreso:</strong> {{ formatearFecha(informe()!.informe.fecha_entrada) }}</p>
+        <div style="text-align: right;">
+          <h3 style="color: #d32f2f; font-size: 1.3rem; font-weight: 800; margin: 0 0 6px 0;">
+            INFORME DE SERVICIO
+          </h3>
+          <p style="color: #1a1a1a; font-size: 0.95rem; margin-bottom: 4px;">
+            <strong>Factura:</strong> {{ informe()!.informe.numero_factura }}
+          </p>
+          <p style="color: #1a1a1a; font-size: 0.95rem; margin-bottom: 4px;">
+            <strong>Fecha ingreso:</strong> {{ formatearFecha(informe()!.informe.fecha_entrada) }}
+          </p>
         </div>
       </div>
 
       <!-- ============================================ -->
-      <!-- CLIENTE (izquierda) Y VEHÍCULO (derecha)      -->
+      <!-- CLIENTE Y VEHÍCULO                            -->
       <!-- ============================================ -->
-      <table class="tabla-cliente-vehiculo mb-4">
+      <table style="width: 100%; border-collapse: collapse; table-layout: fixed; margin-bottom: 25px;">
         <tr>
-          <!-- Columna izquierda: CLIENTE -->
-          <td class="celda-cliente">
-            <h6 class="text-muted text-uppercase mb-2">
+          <!-- CLIENTE -->
+          <td style="width: 50%; vertical-align: top; padding: 0 20px 0 0; border-right: 1px solid #e0e0e0;">
+            <h6 style="color: #555555; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin: 0 0 10px 0;">
               <i class="bi bi-person-fill"></i> Cliente
             </h6>
-            @if (informe()!.informe.foto_cliente) {
-              <div class="foto-informe foto-cliente mb-2">
-                <img [src]="informe()!.informe.foto_cliente!" alt="Cliente" />
+            <div style="display: flex; gap: 15px; align-items: flex-start;">
+              @if (informe()!.informe.foto_cliente) {
+                <div style="width: 90px; height: 90px; max-width: 90px; max-height: 90px; border-radius: 10px; overflow: hidden; border: 2px solid #d32f2f; background-color: #f5f5f5; flex-shrink: 0;">
+                  <img [src]="informe()!.informe.foto_cliente!"
+                       alt="Cliente"
+                       style="width: 90px; height: 90px; max-width: 90px; max-height: 90px; object-fit: cover; display: block;" />
+                </div>
+              }
+              <div style="flex: 1; min-width: 0;">
+                <p style="color: #1a1a1a; font-size: 1rem; margin: 0 0 6px 0; font-weight: 700;">
+                  {{ informe()!.informe.cliente_nombre }}
+                </p>
+                <p style="color: #555555; font-size: 0.85rem; margin: 0 0 4px 0;">
+                  <strong style="color: #1a1a1a;">CI:</strong> {{ informe()!.informe.cliente_cedula || '-' }}
+                </p>
+                <p style="color: #555555; font-size: 0.85rem; margin: 0 0 4px 0;">
+                  <strong style="color: #1a1a1a;">Tel:</strong> {{ informe()!.informe.cliente_telefono || '-' }}
+                </p>
               </div>
-            }
-            <p class="mb-1"><strong>{{ informe()!.informe.cliente_nombre }}</strong></p>
-            <p class="mb-1"><small>CI: {{ informe()!.informe.cliente_cedula || '-' }}</small></p>
-            <p class="mb-1"><small>Tel: {{ informe()!.informe.cliente_telefono || '-' }}</small></p>
+            </div>
           </td>
 
-          <!-- Columna derecha: VEHÍCULO -->
-          <td class="celda-vehiculo text-end">
-            <h6 class="text-muted text-uppercase mb-2">
+          <!-- VEHÍCULO -->
+          <td style="width: 50%; vertical-align: top; padding: 0 0 0 20px; text-align: right;">
+            <h6 style="color: #555555; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin: 0 0 10px 0; text-align: right;">
               <i class="bi bi-car-front-fill"></i> Vehículo
             </h6>
-            @if (informe()!.informe.foto_carro) {
-              <div class="foto-informe foto-carro mb-2 ms-auto">
-                <img [src]="informe()!.informe.foto_carro!" alt="Carro" />
+            <div style="display: flex; gap: 15px; align-items: flex-start; justify-content: flex-end;">
+              <div style="flex: 1; min-width: 0; text-align: right;">
+                <p style="color: #1a1a1a; font-size: 1rem; margin: 0 0 6px 0; font-weight: 700;">
+                  {{ informe()!.informe.carro }}
+                </p>
+                <p style="color: #555555; font-size: 0.85rem; margin: 0 0 4px 0;">
+                  <strong style="color: #1a1a1a;">Servicio:</strong> {{ informe()!.informe.descripcion_trabajo }}
+                </p>
               </div>
-            }
-            <p class="mb-1"><strong>{{ informe()!.informe.carro }}</strong></p>
-            <p class="mb-1"><small>Servicio: {{ informe()!.informe.descripcion_trabajo }}</small></p>
+              @if (informe()!.informe.foto_carro) {
+                <div style="width: 140px; height: 100px; max-width: 140px; max-height: 100px; border-radius: 10px; overflow: hidden; border: 2px solid #d32f2f; background-color: #f5f5f5; flex-shrink: 0;">
+                  <img [src]="informe()!.informe.foto_carro!"
+                       alt="Carro"
+                       style="width: 140px; height: 100px; max-width: 140px; max-height: 100px; object-fit: cover; display: block;" />
+                </div>
+              }
+            </div>
           </td>
         </tr>
       </table>
 
-      <!-- ESTADO AL INGRESO -->
-      <div class="card-datos mb-4">
-        <h6 class="text-muted text-uppercase mb-3"><i class="bi bi-speedometer2"></i> Estado al ingreso</h6>
-        <div class="row">
-          <div class="col-md-4">
-            <label class="form-label small text-muted">Kilometraje</label>
+      <!-- ============================================ -->
+      <!-- ESTADO AL INGRESO                             -->
+      <!-- ============================================ -->
+      <div style="background-color: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 10px; padding: 16px 20px; margin-bottom: 20px;">
+        <h6 style="color: #555555; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin: 0 0 12px 0;">
+          <i class="bi bi-speedometer2"></i> Estado al ingreso
+        </h6>
+        <div style="display: flex; gap: 20px;">
+          <div style="flex: 1;">
+            <p style="color: #757575; font-size: 0.78rem; margin: 0 0 4px 0; text-transform: uppercase; letter-spacing: 0.5px;">Kilometraje</p>
             @if (modoEdicion()) {
-              <div class="input-group">
-                <input type="number" class="form-control" [(ngModel)]="form.kilometraje" min="0" />
-                <span class="input-group-text">km</span>
-              </div>
+              <input type="number" [(ngModel)]="form.kilometraje" style="width: 100%; padding: 6px 10px; border: 1.5px solid #e0e0e0; border-radius: 6px; color: #1a1a1a; background-color: #ffffff; font-size: 0.9rem;" />
             } @else {
-              <p class="mb-0"><strong>{{ informe()!.informe.kilometraje | number }} km</strong></p>
+              <p style="color: #1a1a1a; font-size: 1rem; font-weight: 700; margin: 0;">
+                {{ informe()!.informe.kilometraje | number }} km
+              </p>
             }
           </div>
-          <div class="col-md-4">
-            <label class="form-label small text-muted">Nivel de combustible</label>
+          <div style="flex: 1;">
+            <p style="color: #757575; font-size: 0.78rem; margin: 0 0 4px 0; text-transform: uppercase; letter-spacing: 0.5px;">Nivel de combustible</p>
             @if (modoEdicion()) {
-              <select class="form-select" [(ngModel)]="form.nivel_combustible">
+              <select [(ngModel)]="form.nivel_combustible" style="width: 100%; padding: 6px 10px; border: 1.5px solid #e0e0e0; border-radius: 6px; color: #1a1a1a; background-color: #ffffff; font-size: 0.9rem;">
                 <option value="vacio">Vacío</option>
                 <option value="1/4">1/4</option>
                 <option value="1/2">1/2</option>
@@ -113,81 +150,90 @@
                 <option value="lleno">Lleno</option>
               </select>
             } @else {
-              <p class="mb-0"><strong>{{ nivelCombustibleTexto(informe()!.informe.nivel_combustible) }}</strong></p>
+              <p style="color: #1a1a1a; font-size: 1rem; font-weight: 700; margin: 0;">
+                {{ nivelCombustibleTexto(informe()!.informe.nivel_combustible) }}
+              </p>
             }
           </div>
-          <div class="col-md-4">
-            <label class="form-label small text-muted">Garantía</label>
+          <div style="flex: 1;">
+            <p style="color: #757575; font-size: 0.78rem; margin: 0 0 4px 0; text-transform: uppercase; letter-spacing: 0.5px;">Garantía</p>
             @if (modoEdicion()) {
-              <div class="input-group">
-                <input type="number" class="form-control" [(ngModel)]="form.garantia_dias" min="0" />
-                <span class="input-group-text">días</span>
-              </div>
+              <input type="number" [(ngModel)]="form.garantia_dias" style="width: 100%; padding: 6px 10px; border: 1.5px solid #e0e0e0; border-radius: 6px; color: #1a1a1a; background-color: #ffffff; font-size: 0.9rem;" />
             } @else {
-              <p class="mb-0"><strong>{{ informe()!.informe.garantia_dias }} días</strong></p>
+              <p style="color: #1a1a1a; font-size: 1rem; font-weight: 700; margin: 0;">
+                {{ informe()!.informe.garantia_dias }} días
+              </p>
             }
           </div>
         </div>
       </div>
 
-      <!-- REPUESTOS -->
+      <!-- ============================================ -->
+      <!-- REPUESTOS UTILIZADOS                          -->
+      <!-- ============================================ -->
       @if (informe()!.repuestos && informe()!.repuestos.length > 0) {
-        <h6 class="text-muted text-uppercase mt-4 mb-2"><i class="bi bi-tools"></i> Repuestos utilizados</h6>
-        <table class="table table-sm table-bordered">
-          <thead class="table-light">
+        <h6 style="color: #555555; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin: 15px 0 10px 0;">
+          <i class="bi bi-tools"></i> Repuestos utilizados
+        </h6>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px;">
+          <thead>
             <tr>
-              <th>Código</th><th>Repuesto</th>
-              <th class="text-center">Cantidad</th>
-              <th class="text-end">P. Unit</th>
-              <th class="text-end">Subtotal</th>
+              <th style="background-color: #212121 !important; color: #ffffff !important; padding: 10px 12px; text-align: left; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; border: 1px solid #212121;">Código</th>
+              <th style="background-color: #212121 !important; color: #ffffff !important; padding: 10px 12px; text-align: left; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; border: 1px solid #212121;">Repuesto</th>
+              <th style="background-color: #212121 !important; color: #ffffff !important; padding: 10px 12px; text-align: center; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; border: 1px solid #212121; width: 80px;">Cant.</th>
+              <th style="background-color: #212121 !important; color: #ffffff !important; padding: 10px 12px; text-align: right; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; border: 1px solid #212121; width: 110px;">P. Unit</th>
+              <th style="background-color: #212121 !important; color: #ffffff !important; padding: 10px 12px; text-align: right; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; border: 1px solid #212121; width: 110px;">Subtotal</th>
             </tr>
           </thead>
           <tbody>
             @for (r of informe()!.repuestos; track r.id) {
               <tr>
-                <td><code>{{ r.repuesto_codigo }}</code></td>
-                <td>{{ r.repuesto_nombre }}</td>
-                <td class="text-center">{{ r.cantidad }}</td>
-                <td class="text-end">{{ formatearBs(r.precio_unitario) }}</td>
-                <td class="text-end">{{ formatearBs(r.subtotal) }}</td>
+                <td style="padding: 8px 12px; color: #1a1a1a; border: 1px solid #e0e0e0;">
+                  <code style="color: #c62828; background-color: #fce4ec; padding: 3px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 700;">{{ r.repuesto_codigo }}</code>
+                </td>
+                <td style="padding: 8px 12px; color: #1a1a1a; border: 1px solid #e0e0e0; font-size: 0.9rem;">{{ r.repuesto_nombre }}</td>
+                <td style="padding: 8px 12px; color: #1a1a1a; border: 1px solid #e0e0e0; text-align: center;">{{ r.cantidad }}</td>
+                <td style="padding: 8px 12px; color: #1a1a1a; border: 1px solid #e0e0e0; text-align: right;">{{ formatearBs(r.precio_unitario) }}</td>
+                <td style="padding: 8px 12px; color: #1a1a1a; border: 1px solid #e0e0e0; text-align: right;"><strong>{{ formatearBs(r.subtotal) }}</strong></td>
               </tr>
             }
           </tbody>
         </table>
       }
 
-      <!-- CHECKLIST -->
-      <h6 class="text-muted text-uppercase mt-4 mb-2"><i class="bi bi-check2-square"></i> Checklist de verificación</h6>
-      <table class="table table-sm table-bordered">
-        <thead class="table-light">
+      <!-- ============================================ -->
+      <!-- CHECKLIST                                     -->
+      <!-- ============================================ -->
+      <h6 style="color: #555555; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin: 20px 0 10px 0;">
+        <i class="bi bi-check2-square"></i> Checklist de verificación
+      </h6>
+      <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px;">
+        <thead>
           <tr>
-            <th style="width: 60%;">Punto verificado</th>
-            <th style="width: 15%;" class="text-center">Estado</th>
-            <th>Observación</th>
+            <th style="background-color: #212121 !important; color: #ffffff !important; padding: 8px 12px; text-align: left; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; border: 1px solid #212121;">Punto verificado</th>
+            <th style="background-color: #212121 !important; color: #ffffff !important; padding: 8px 12px; text-align: center; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; border: 1px solid #212121; width: 120px;">Estado</th>
+            <th style="background-color: #212121 !important; color: #ffffff !important; padding: 8px 12px; text-align: left; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; border: 1px solid #212121;">Observación</th>
           </tr>
         </thead>
         <tbody>
           @for (item of checklist; track $index) {
             <tr>
-              <td>
+              <td style="padding: 6px 10px; color: #1a1a1a; border: 1px solid #e0e0e0; font-size: 0.85rem;">
                 @if (modoEdicion()) {
-                  <input type="text" class="form-control form-control-sm" [(ngModel)]="item.item" />
+                  <input type="text" [(ngModel)]="item.item" style="width: 100%; padding: 4px 8px; border: 1px solid #e0e0e0; border-radius: 4px; color: #1a1a1a; background-color: #ffffff; font-size: 0.85rem;" />
                 } @else {
                   {{ item.item }}
                 }
               </td>
-              <td class="text-center">
+              <td style="padding: 6px 10px; color: #1a1a1a; border: 1px solid #e0e0e0; font-size: 0.85rem; text-align: center;">
                 @if (modoEdicion()) {
-                  <select class="form-select form-select-sm" [(ngModel)]="item.estado">
+                  <select [(ngModel)]="item.estado" style="padding: 4px 8px; border: 1px solid #e0e0e0; border-radius: 4px; color: #1a1a1a; background-color: #ffffff; font-size: 0.85rem;">
                     <option value="ok">✓ OK</option>
                     <option value="revisar">⚠ Revisar</option>
                     <option value="no_aplica">— N/A</option>
                   </select>
                 } @else {
-                  <span class="badge-estado"
-                    [class.badge-finalizado]="item.estado === 'ok'"
-                    [class.badge-pendiente]="item.estado === 'revisar'"
-                    [class.badge-secondary]="item.estado === 'no_aplica'">
+                  <span [class]="'badge-estado badge-' + item.estado">
                     @switch (item.estado) {
                       @case ('ok') { ✓ OK }
                       @case ('revisar') { ⚠ Revisar }
@@ -196,9 +242,9 @@
                   </span>
                 }
               </td>
-              <td>
+              <td style="padding: 6px 10px; color: #1a1a1a; border: 1px solid #e0e0e0; font-size: 0.85rem;">
                 @if (modoEdicion()) {
-                  <input type="text" class="form-control form-control-sm" [(ngModel)]="item.observacion" />
+                  <input type="text" [(ngModel)]="item.observacion" style="width: 100%; padding: 4px 8px; border: 1px solid #e0e0e0; border-radius: 4px; color: #1a1a1a; background-color: #ffffff; font-size: 0.85rem;" />
                 } @else {
                   {{ item.observacion || '-' }}
                 }
@@ -208,81 +254,106 @@
         </tbody>
       </table>
 
-      <!-- HALLAZGOS Y RECOMENDACIONES -->
-      <div class="row mt-4">
-        <div class="col-md-6">
-          <h6 class="text-muted text-uppercase mb-2"><i class="bi bi-search"></i> Hallazgos</h6>
+      <!-- ============================================ -->
+      <!-- HALLAZGOS Y RECOMENDACIONES                   -->
+      <!-- ============================================ -->
+      <div style="display: flex; gap: 20px; margin-top: 20px;">
+        <div style="flex: 1;">
+          <h6 style="color: #555555; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin: 0 0 10px 0;">
+            <i class="bi bi-search"></i> Hallazgos
+          </h6>
           @if (modoEdicion()) {
-            <textarea class="form-control" rows="4" [(ngModel)]="form.hallazgos"></textarea>
+            <textarea [(ngModel)]="form.hallazgos" rows="4" style="width: 100%; padding: 8px 10px; border: 1.5px solid #e0e0e0; border-radius: 6px; color: #1a1a1a; background-color: #ffffff; font-size: 0.9rem;"></textarea>
           } @else {
-            <p class="p-3 bg-light rounded">{{ informe()!.informe.hallazgos || 'Sin hallazgos registrados' }}</p>
+            <div style="padding: 12px; background-color: #f8f9fa; border-radius: 8px; color: #333333; font-size: 0.9rem; min-height: 60px;">
+              {{ informe()!.informe.hallazgos || 'Sin hallazgos registrados' }}
+            </div>
           }
         </div>
-        <div class="col-md-6">
-          <h6 class="text-muted text-uppercase mb-2"><i class="bi bi-lightbulb"></i> Recomendaciones</h6>
+        <div style="flex: 1;">
+          <h6 style="color: #555555; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin: 0 0 10px 0;">
+            <i class="bi bi-lightbulb"></i> Recomendaciones
+          </h6>
           @if (modoEdicion()) {
-            <textarea class="form-control" rows="4" [(ngModel)]="form.recomendaciones"></textarea>
+            <textarea [(ngModel)]="form.recomendaciones" rows="4" style="width: 100%; padding: 8px 10px; border: 1.5px solid #e0e0e0; border-radius: 6px; color: #1a1a1a; background-color: #ffffff; font-size: 0.9rem;"></textarea>
           } @else {
-            <p class="p-3 bg-light rounded">{{ informe()!.informe.recomendaciones || 'Sin recomendaciones' }}</p>
+            <div style="padding: 12px; background-color: #f8f9fa; border-radius: 8px; color: #333333; font-size: 0.9rem; min-height: 60px;">
+              {{ informe()!.informe.recomendaciones || 'Sin recomendaciones' }}
+            </div>
           }
         </div>
       </div>
 
-      <!-- PRÓXIMO SERVICIO -->
-      <div class="card-proximo mt-4 mb-4">
-        <h6 class="text-muted text-uppercase mb-3"><i class="bi bi-calendar-event"></i> Próximo servicio recomendado</h6>
-        <div class="row">
-          <div class="col-md-6">
-            <label class="form-label small text-muted">A los</label>
+      <!-- ============================================ -->
+      <!-- PRÓXIMO SERVICIO                              -->
+      <!-- ============================================ -->
+      <div style="background-color: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 10px; padding: 16px 20px; margin-top: 20px; margin-bottom: 20px;">
+        <h6 style="color: #555555; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin: 0 0 12px 0;">
+          <i class="bi bi-calendar-event"></i> Próximo servicio recomendado
+        </h6>
+        <div style="display: flex; gap: 20px;">
+          <div style="flex: 1;">
+            <p style="color: #757575; font-size: 0.78rem; margin: 0 0 4px 0; text-transform: uppercase; letter-spacing: 0.5px;">A los</p>
             @if (modoEdicion()) {
-              <div class="input-group">
-                <input type="number" class="form-control" [(ngModel)]="form.proximo_servicio_km" min="0" step="1000" />
-                <span class="input-group-text">km</span>
-              </div>
+              <input type="number" [(ngModel)]="form.proximo_servicio_km" style="width: 100%; padding: 6px 10px; border: 1.5px solid #e0e0e0; border-radius: 6px; color: #1a1a1a; background-color: #ffffff; font-size: 0.9rem;" />
             } @else {
-              <p class="mb-0"><strong>{{ informe()!.informe.proximo_servicio_km | number }} km</strong></p>
+              <p style="color: #1a1a1a; font-size: 1rem; font-weight: 700; margin: 0;">
+                {{ informe()!.informe.proximo_servicio_km | number }} km
+              </p>
             }
           </div>
-          <div class="col-md-6">
-            <label class="form-label small text-muted">O el</label>
+          <div style="flex: 1;">
+            <p style="color: #757575; font-size: 0.78rem; margin: 0 0 4px 0; text-transform: uppercase; letter-spacing: 0.5px;">O el</p>
             @if (modoEdicion()) {
-              <input type="date" class="form-control" [(ngModel)]="form.proximo_servicio_fecha" />
+              <input type="date" [(ngModel)]="form.proximo_servicio_fecha" style="width: 100%; padding: 6px 10px; border: 1.5px solid #e0e0e0; border-radius: 6px; color: #1a1a1a; background-color: #ffffff; font-size: 0.9rem;" />
             } @else {
-              <p class="mb-0"><strong>{{ formatearFecha(informe()!.informe.proximo_servicio_fecha) }}</strong></p>
+              <p style="color: #1a1a1a; font-size: 1rem; font-weight: 700; margin: 0;">
+                {{ formatearFecha(informe()!.informe.proximo_servicio_fecha) }}
+              </p>
             }
           </div>
         </div>
       </div>
 
-      <!-- FIRMAS -->
-      <div class="row mt-5 pt-4">
-        <div class="col-md-6 text-center">
+      <!-- ============================================ -->
+      <!-- FIRMAS                                        -->
+      <!-- ============================================ -->
+      <div style="display: flex; gap: 40px; margin-top: 40px; padding-top: 20px;">
+        <div style="flex: 1; text-align: center;">
           @if (modoEdicion()) {
-            <input type="text" class="form-control text-center" [(ngModel)]="form.firma_tecnico" placeholder="Nombre del técnico" />
+            <input type="text" [(ngModel)]="form.firma_tecnico" placeholder="Nombre del técnico" style="width: 100%; padding: 6px 10px; border: 1.5px solid #e0e0e0; border-radius: 6px; color: #1a1a1a; background-color: #ffffff; font-size: 0.9rem; text-align: center; margin-bottom: 8px;" />
           } @else {
-            <div class="firma-linea"><strong>{{ informe()!.informe.firma_tecnico }}</strong></div>
+            <p style="color: #1a1a1a; font-size: 1rem; font-weight: 700; margin: 0 0 8px 0; min-height: 25px;">
+              {{ informe()!.informe.firma_tecnico }}
+            </p>
           }
-          <hr style="border-top: 1px solid #000; margin: 8px auto; width: 80%;" />
-          <small class="text-muted">Técnico responsable</small>
+          <hr style="border: none; border-top: 1px solid #1a1a1a; margin: 8px auto; width: 80%;" />
+          <small style="color: #666666; font-size: 0.8rem;">Técnico responsable</small>
         </div>
-        <div class="col-md-6 text-center">
+        <div style="flex: 1; text-align: center;">
           @if (modoEdicion()) {
-            <input type="text" class="form-control text-center" [(ngModel)]="form.firma_cliente" placeholder="Nombre del cliente" />
+            <input type="text" [(ngModel)]="form.firma_cliente" placeholder="Nombre del cliente" style="width: 100%; padding: 6px 10px; border: 1.5px solid #e0e0e0; border-radius: 6px; color: #1a1a1a; background-color: #ffffff; font-size: 0.9rem; text-align: center; margin-bottom: 8px;" />
           } @else {
-            <div class="firma-linea"><strong>{{ informe()!.informe.firma_cliente || 'Cliente' }}</strong></div>
+            <p style="color: #1a1a1a; font-size: 1rem; font-weight: 700; margin: 0 0 8px 0; min-height: 25px;">
+              {{ informe()!.informe.firma_cliente || 'Cliente' }}
+            </p>
           }
-          <hr style="border-top: 1px solid #000; margin: 8px auto; width: 80%;" />
-          <small class="text-muted">Recibí conforme</small>
+          <hr style="border: none; border-top: 1px solid #1a1a1a; margin: 8px auto; width: 80%;" />
+          <small style="color: #666666; font-size: 0.8rem;">Recibí conforme</small>
         </div>
       </div>
 
-      <!-- PIE -->
-      <div class="text-center mt-5 pt-4 border-top">
-        <p class="text-muted mb-0">
-          <strong>DemonCar - Taller Automotriz</strong><br />
-          <small>Este informe certifica los trabajos realizados al vehículo.</small>
+      <!-- ============================================ -->
+      <!-- PIE                                           -->
+      <!-- ============================================ -->
+      <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+        <p style="color: #666666; font-size: 0.9rem; margin: 0;">
+          <strong style="color: #333333;">DemonCar - Taller Automotriz</strong><br />
+          <small style="color: #888888; font-size: 0.82rem;">Este informe certifica los trabajos realizados al vehículo.</small><br />
+          <small style="color: #888888; font-size: 0.82rem;">Garantía de {{ informe()!.informe.garantia_dias }} días sobre los trabajos realizados.</small>
         </p>
       </div>
+
     </div>
   }
 </div>

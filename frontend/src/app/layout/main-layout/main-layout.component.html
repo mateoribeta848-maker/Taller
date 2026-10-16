@@ -2,16 +2,14 @@
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-header">
-      <i class="bi bi-tools"></i> DemonCar
+      <img src="/demoncar-logo.png" alt="DemonCar" class="logo-sidebar" />
+      <span>DemonCar</span>
     </div>
 
     <ul class="sidebar-menu">
       @for (item of menuItems; track item.path) {
         <li>
-          <a
-            [routerLink]="item.path"
-            routerLinkActive="active"
-          >
+          <a [routerLink]="item.path" routerLinkActive="active">
             <i class="bi" [class]="item.icon"></i>
             <span>{{ item.label }}</span>
           </a>
@@ -32,7 +30,6 @@
 
   <!-- MAIN CONTENT -->
   <main class="main-content">
-    <!-- TOPBAR -->
     <header class="topbar">
       <div class="d-flex align-items-center gap-2">
         <h5 class="m-0 fw-semibold">Taller Automotriz</h5>
@@ -65,7 +62,6 @@
       </div>
     </header>
 
-    <!-- PAGE CONTENT -->
     <div class="page-content">
       <router-outlet />
     </div>

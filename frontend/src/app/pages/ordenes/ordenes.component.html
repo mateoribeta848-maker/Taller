@@ -1,0 +1,277 @@
+<div class="card-table">
+  <div class="card-header">
+    <div>
+      <h4 class="m-0">
+        <i class="bi bi-clipboard-check-fill text-danger"></i> Órdenes de Trabajo
+      </h4>
+      <small class="text-muted">Gestión de órdenes y servicios por vehículo</small>
+    </div>
+
+    <div class="d-flex gap-2 flex-wrap">
+      <select
+        class="form-select"
+        style="width: 160px;"
+        [value]="filtroEstado()"
+        (change)="filtroEstado.set($any($event.target).value)"
+      >
+        <option value="todos">Todos los estados</option>
+        <option value="pendiente">Pendientes</option>
+        <option value="en_proceso">En proceso</option>
+        <option value="finalizado">Finalizados</option>
+        <option value="cancelado">Cancelados</option>
+      </select>
+
+      <div class="input-group" style="width: 260px;">
+        <span class="input-group-text"><i class="bi bi-search"></i></span>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Buscar orden, cliente, placa..."
+          [value]="busqueda()"
+          (input)="busqueda.set($any($event.target).value)"
+        />
+      </div>
+
+      <button class="btn btn-primary" (click)="abrirCrear()">
+        <i class="bi bi-plus-lg"></i> Nueva Orden
+      </button>
+    </div>
+  </div>
+
+  @if (cargando()) {
+    <div class="text-center p-5">
+      <div class="spinner-border text-danger"></div>
+      <p class="mt-2 text-muted">Cargando órdenes...</p>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="alert alert-danger m-3">
+      <i class="bi bi-exclamation-triangle"></i> {{ error() }}
+    </div>
+  }
+
+  @if (!cargando() && !error()) {
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th>ID Orden</th>
+            <th>Fecha Ingreso</th>
+            <th>Cliente</th>
+            <th>Vehículo (Placa/Modelo)</th>
+            <th class="text-center">Servicios</th>
+            <th>Mecánico Asignado</th>
+            <th class="text-center">Estado</th>
+            <th class="text-end">Total</th>
+            <th style="width: 150px;" class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (o of ordenesFiltradas; track o.id) {
+            <tr>
+              <td>
+                <code class="text-danger fw-bold">{{ o.numero_orden }}</code>
+              </td>
+              <td>{{ formatearFecha(o.fecha_ingreso) }}</td>
+              <td>
+                <div>{{ o.cliente_nombre }}</div>
+                <small class="text-muted">CI: {{ o.cliente_cedula || '-' }}</small>
+              </td>
+              <td>
+                <div>
+                  <span class="badge bg-dark me-1">{{ o.placa || 'S/P' }}</span>
+                  {{ o.vehiculo || '-' }}
+                </div>
+              </td>
+              <td class="text-center">
+                <span class="badge bg-info text-dark">
+                  {{ o.total_servicios || 0 }}
+                </span>
+              </td>
+              <td>
+                <i class="bi bi-person-workspace"></i>
+                {{ o.mecanico_asignado || '-' }}
+              </td>
+              <td class="text-center">
+                <span class="badge-estado" [class]="colorEstado(o.estado)">
+                  {{ textoEstado(o.estado) }}
+                </span>
+              </td>
+              <td class="text-end fw-bold text-success">
+                {{ formatearBs(o.total_precio) }}
+              </td>
+              <td class="text-center">
+                <button class="btn btn-sm btn-outline-warning me-1" (click)="abrirEditar(o)" title="Editar">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" (click)="eliminar(o)" title="Eliminar">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+            </tr>
+          }
+
+          @if (ordenesFiltradas.length === 0) {
+            <tr>
+              <td colspan="9" class="text-center text-muted py-4">
+                <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                No hay órdenes registradas
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+
+@if (mostrarModal()) {
+  <div class="modal-backdrop-custom" (click)="cerrarModal()"></div>
+  <div class="modal-custom">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">
+          <i class="bi" [class]="editando() ? 'bi-pencil-square' : 'bi-plus-circle'"></i>
+          {{ editando() ? 'Editar Orden' : 'Nueva Orden de Trabajo' }}
+        </h5>
+        <button class="btn-close btn-close-white" (click)="cerrarModal()"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Cliente *</label>
+            <select class="form-select" [(ngModel)]="ordenForm.cliente_id">
+              <option [value]="0" disabled>Selecciona un cliente</option>
+              @for (c of clientes(); track c.id) {
+                <option [value]="c.id">{{ c.nombre }} {{ c.apellido }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Vehículo *</label>
+            <select class="form-select" [(ngModel)]="ordenForm.tipo_carro_id">
+              <option [value]="0" disabled>Selecciona un vehículo</option>
+              @for (c of carros(); track c.id) {
+                <option [value]="c.id">{{ c.marca }} {{ c.modelo }} ({{ c.anio }})</option>
+              }
+            </select>
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Placa</label>
+            <input type="text" class="form-control" [(ngModel)]="ordenForm.placa" placeholder="Ej: 1234ABC" />
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Mecánico asignado *</label>
+            <input type="text" class="form-control" [(ngModel)]="ordenForm.mecanico_asignado" placeholder="Nombre del mecánico" />
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Estado</label>
+            <select class="form-select" [(ngModel)]="ordenForm.estado">
+              <option value="pendiente">Pendiente</option>
+              <option value="en_proceso">En proceso</option>
+              <option value="finalizado">Finalizado</option>
+              <option value="cancelado">Cancelado</option>
+            </select>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Observaciones</label>
+            <textarea class="form-control" rows="2" [(ngModel)]="ordenForm.observaciones" placeholder="Notas adicionales"></textarea>
+          </div>
+
+          <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <label class="form-label mb-0">Servicios de la orden</label>
+              <button class="btn btn-sm btn-outline-danger" (click)="agregarServicio()">
+                <i class="bi bi-plus"></i> Agregar servicio
+              </button>
+            </div>
+
+            @if (serviciosSeleccionados.length === 0) {
+              <div class="alert alert-secondary text-center py-2 mb-0">
+                <small>Sin servicios agregados</small>
+              </div>
+            } @else {
+              <div class="table-responsive">
+                <table class="table table-sm table-bordered mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Tipo de servicio</th>
+                      <th>Descripción</th>
+                      <th style="width: 130px;" class="text-end">Precio</th>
+                      <th style="width: 90px;" class="text-center">Hecho</th>
+                      <th style="width: 60px;"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (s of serviciosSeleccionados; track $index) {
+                      <tr>
+                        <td>
+                          <select
+                            class="form-select form-select-sm"
+                            [(ngModel)]="s.tipo_trabajo_id"
+                            (change)="cambiarServicio($index)"
+                          >
+                            @for (t of tiposTrabajos(); track t.id) {
+                              <option [value]="t.id">{{ t.nombre }}</option>
+                            }
+                          </select>
+                        </td>
+                        <td>
+                          <input
+                            type="text"
+                            class="form-control form-control-sm"
+                            [(ngModel)]="s.descripcion"
+                            placeholder="Detalles..."
+                          />
+                        </td>
+                        <td class="text-end">
+                          <input
+                            type="number"
+                            class="form-control form-control-sm text-end"
+                            [(ngModel)]="s.precio"
+                            min="0"
+                            step="0.01"
+                          />
+                        </td>
+                        <td class="text-center">
+                          <input type="checkbox" class="form-check-input" [(ngModel)]="s.completado" />
+                        </td>
+                        <td class="text-center">
+                          <button class="btn btn-sm btn-outline-danger" (click)="eliminarServicio($index)">
+                            <i class="bi bi-x"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="text-end mt-2">
+                <strong>Total: </strong>
+                <span class="text-success fs-5">{{ formatearBs(totalServicios) }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="cerrarModal()">
+          <i class="bi bi-x-lg"></i> Cancelar
+        </button>
+        <button class="btn btn-primary" (click)="guardar()">
+          <i class="bi bi-check-lg"></i>
+          {{ editando() ? 'Actualizar' : 'Guardar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

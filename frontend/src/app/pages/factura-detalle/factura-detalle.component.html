@@ -24,21 +24,27 @@
 
   @if (detalle() && !cargando()) {
     <div class="factura-container">
+
       <!-- ENCABEZADO -->
       <div class="factura-header">
         <div>
-          <h1 class="m-0"><i class="bi bi-gear-fill text-danger"></i> DemonCar</h1>
-          <p class="text-muted mb-0">Taller Automotriz Especializado</p>
-          <small class="text-muted">Santa Cruz, Bolivia</small>
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 4px;">
+            <img src="/demoncar-logo.png" alt="DemonCar" style="width: 45px; height: 45px; object-fit: contain; flex-shrink: 0;" />
+            <h1 style="font-size: 1.75rem; font-weight: 800; color: #1a1a1a; letter-spacing: -0.5px; margin: 0;">DemonCar</h1>
+          </div>
+          <p style="color: #666666; font-size: 0.9rem; margin-bottom: 2px;">Taller Automotriz Especializado</p>
+          <small style="color: #888888; font-size: 0.85rem;">La Paz, Bolivia</small>
         </div>
-        <div class="text-end">
-          <h3 class="text-danger mb-1">{{ detalle()!.trabajo.numero_factura }}</h3>
-          <p class="mb-0">
+        <div style="text-align: right;">
+          <h3 style="color: #d32f2f; font-size: 1.3rem; font-weight: 800; margin: 0 0 6px 0;">
+            {{ detalle()!.trabajo.numero_factura }}
+          </h3>
+          <p style="color: #1a1a1a; font-size: 0.95rem; margin-bottom: 4px;">
             <strong>Fecha:</strong>
             {{ detalle()!.trabajo.fecha_entrada | date: 'dd/MM/yyyy HH:mm' }}
           </p>
           @if (detalle()!.trabajo.fecha_salida) {
-            <p class="mb-0">
+            <p style="color: #1a1a1a; font-size: 0.95rem; margin-bottom: 4px;">
               <strong>Salida:</strong>
               {{ detalle()!.trabajo.fecha_salida | date: 'dd/MM/yyyy HH:mm' }}
             </p>
@@ -49,68 +55,88 @@
         </div>
       </div>
 
-      <!-- CLIENTE (izquierda) Y VEHÍCULO (derecha) -->
-      <div class="row mb-4 align-items-start">
-        <!-- CLIENTE -->
-        <div class="col-md-6">
-          <h6 class="text-muted text-uppercase mb-2"><i class="bi bi-person-fill"></i> Cliente</h6>
-          <div class="d-flex gap-3">
-            @if (detalle()!.trabajo.foto_cliente) {
-              <div class="foto-factura foto-cliente">
-                <img [src]="detalle()!.trabajo.foto_cliente!" alt="Cliente" />
+      <!-- CLIENTE Y VEHÍCULO -->
+      <table style="width: 100%; border-collapse: collapse; table-layout: fixed; margin-bottom: 28px;">
+        <tr>
+          <td style="width: 50%; vertical-align: top; padding: 0 20px 0 0; border-right: 1px solid #e0e0e0;">
+            <h6 style="color: #555555; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin: 0 0 10px 0;">
+              <i class="bi bi-person-fill"></i> Cliente
+            </h6>
+            <div style="display: flex; gap: 15px; align-items: flex-start;">
+              @if (detalle()!.trabajo.foto_cliente) {
+                <div style="width: 90px; height: 90px; max-width: 90px; max-height: 90px; border-radius: 10px; overflow: hidden; border: 2px solid #d32f2f; background-color: #f5f5f5; flex-shrink: 0;">
+                  <img [src]="detalle()!.trabajo.foto_cliente!"
+                       alt="Cliente"
+                       style="width: 90px; height: 90px; max-width: 90px; max-height: 90px; object-fit: cover; display: block;" />
+                </div>
+              }
+              <div style="flex: 1; min-width: 0;">
+                <p style="color: #1a1a1a; font-size: 1rem; margin: 0 0 6px 0; font-weight: 700;">
+                  {{ detalle()!.trabajo.cliente_nombre }}
+                </p>
+                <p style="color: #555555; font-size: 0.85rem; margin: 0 0 4px 0;">
+                  <strong style="color: #1a1a1a;">CI:</strong> {{ detalle()!.trabajo.cliente_cedula || '-' }}
+                </p>
+                <p style="color: #555555; font-size: 0.85rem; margin: 0 0 4px 0;">
+                  <strong style="color: #1a1a1a;">Tel:</strong> {{ detalle()!.trabajo.cliente_telefono || '-' }}
+                </p>
+                <p style="color: #555555; font-size: 0.85rem; margin: 0 0 4px 0;">
+                  <strong style="color: #1a1a1a;">Dir:</strong> {{ detalle()!.trabajo.cliente_direccion || '-' }}
+                </p>
               </div>
-            }
-            <div class="flex-grow-1">
-              <p class="mb-1"><strong>{{ detalle()!.trabajo.cliente_nombre }}</strong></p>
-              <p class="mb-1"><small>CI: {{ detalle()!.trabajo.cliente_cedula || '-' }}</small></p>
-              <p class="mb-1"><small>Tel: {{ detalle()!.trabajo.cliente_telefono || '-' }}</small></p>
-              <p class="mb-1"><small>{{ detalle()!.trabajo.cliente_direccion || '-' }}</small></p>
             </div>
-          </div>
-        </div>
+          </td>
 
-        <!-- VEHÍCULO -->
-        <div class="col-md-6">
-          <h6 class="text-muted text-uppercase mb-2 text-md-end">
-            <i class="bi bi-car-front-fill"></i> Vehículo
-          </h6>
-          <div class="d-flex gap-3 justify-content-md-end align-items-start">
-            <div class="text-md-end">
-              <p class="mb-1"><strong>{{ detalle()!.trabajo.carro }}</strong></p>
-              <p class="mb-1"><small>Servicio: {{ detalle()!.trabajo.descripcion }}</small></p>
-            </div>
-            @if (detalle()!.trabajo.foto_carro) {
-              <div class="foto-factura foto-carro">
-                <img [src]="detalle()!.trabajo.foto_carro!" alt="Carro" />
+          <td style="width: 50%; vertical-align: top; padding: 0 0 0 20px; text-align: right;">
+            <h6 style="color: #555555; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin: 0 0 10px 0; text-align: right;">
+              <i class="bi bi-car-front-fill"></i> Vehículo
+            </h6>
+            <div style="display: flex; gap: 15px; align-items: flex-start; justify-content: flex-end;">
+              <div style="flex: 1; min-width: 0; text-align: right;">
+                <p style="color: #1a1a1a; font-size: 1rem; margin: 0 0 6px 0; font-weight: 700;">
+                  {{ detalle()!.trabajo.carro }}
+                </p>
+                <p style="color: #555555; font-size: 0.85rem; margin: 0 0 4px 0;">
+                  <strong style="color: #1a1a1a;">Servicio:</strong> {{ detalle()!.trabajo.descripcion }}
+                </p>
               </div>
-            }
-          </div>
-        </div>
-      </div>
+              @if (detalle()!.trabajo.foto_carro) {
+                <div style="width: 140px; height: 100px; max-width: 140px; max-height: 100px; border-radius: 10px; overflow: hidden; border: 2px solid #d32f2f; background-color: #f5f5f5; flex-shrink: 0;">
+                  <img [src]="detalle()!.trabajo.foto_carro!"
+                       alt="Carro"
+                       style="width: 140px; height: 100px; max-width: 140px; max-height: 100px; object-fit: cover; display: block;" />
+                </div>
+              }
+            </div>
+          </td>
+        </tr>
+      </table>
 
       <!-- TABLA DE REPUESTOS -->
       @if (detalle()!.detalle.length > 0) {
-        <h6 class="text-muted text-uppercase mt-4 mb-2">
+        <h6 style="color: #555555; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin: 15px 0 10px 0;">
           <i class="bi bi-tools"></i> Repuestos utilizados
         </h6>
-        <table class="table table-sm table-bordered">
-          <thead class="table-light">
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px;">
+          <thead>
             <tr>
-              <th style="width: 120px;">Código</th>
-              <th>Repuesto</th>
-              <th class="text-center" style="width: 90px;">Cant.</th>
-              <th class="text-end" style="width: 130px;">P. Unit</th>
-              <th class="text-end" style="width: 130px;">Subtotal</th>
+              <th style="background-color: #212121 !important; color: #ffffff !important; padding: 12px 14px; text-align: left; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; border: 1px solid #212121;">Código</th>
+              <th style="background-color: #212121 !important; color: #ffffff !important; padding: 12px 14px; text-align: left; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; border: 1px solid #212121;">Repuesto</th>
+              <th style="background-color: #212121 !important; color: #ffffff !important; padding: 12px 14px; text-align: center; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; border: 1px solid #212121; width: 80px;">Cant.</th>
+              <th style="background-color: #212121 !important; color: #ffffff !important; padding: 12px 14px; text-align: right; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; border: 1px solid #212121; width: 120px;">P. Unit</th>
+              <th style="background-color: #212121 !important; color: #ffffff !important; padding: 12px 14px; text-align: right; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; border: 1px solid #212121; width: 120px;">Subtotal</th>
             </tr>
           </thead>
           <tbody>
             @for (d of detalle()!.detalle; track d.id) {
               <tr>
-                <td><code>{{ d.repuesto_codigo }}</code></td>
-                <td>{{ d.repuesto_nombre }}</td>
-                <td class="text-center">{{ d.cantidad }}</td>
-                <td class="text-end">{{ formatearBs(d.precio_unitario) }}</td>
-                <td class="text-end">{{ formatearBs(d.subtotal) }}</td>
+                <td style="padding: 10px 14px; color: #1a1a1a; border: 1px solid #e0e0e0;">
+                  <code style="color: #c62828; background-color: #fce4ec; padding: 3px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 700;">{{ d.repuesto_codigo }}</code>
+                </td>
+                <td style="padding: 10px 14px; color: #1a1a1a; border: 1px solid #e0e0e0;">{{ d.repuesto_nombre }}</td>
+                <td style="padding: 10px 14px; color: #1a1a1a; border: 1px solid #e0e0e0; text-align: center;">{{ d.cantidad }}</td>
+                <td style="padding: 10px 14px; color: #1a1a1a; border: 1px solid #e0e0e0; text-align: right;">{{ formatearBs(d.precio_unitario) }}</td>
+                <td style="padding: 10px 14px; color: #1a1a1a; border: 1px solid #e0e0e0; text-align: right;"><strong>{{ formatearBs(d.subtotal) }}</strong></td>
               </tr>
             }
           </tbody>
@@ -118,37 +144,55 @@
       }
 
       <!-- TOTALES -->
-      <div class="row mt-4">
-        <div class="col-md-6 offset-md-6">
-          <table class="table table-sm mb-0 tabla-totales">
-            <tr><td>Mano de obra:</td><td class="text-end">{{ formatearBs(detalle()!.trabajo.costo_mano_obra) }}</td></tr>
-            <tr><td>Repuestos:</td><td class="text-end">{{ formatearBs(detalle()!.trabajo.costo_repuestos) }}</td></tr>
-            <tr><td>Descuento:</td><td class="text-end text-danger">- {{ formatearBs(detalle()!.trabajo.descuento) }}</td></tr>
-            <tr class="border-top"><td><strong>Subtotal:</strong></td><td class="text-end"><strong>{{ formatearBs(detalle()!.trabajo.subtotal) }}</strong></td></tr>
-            <tr><td>IVA (13%):</td><td class="text-end">{{ formatearBs(detalle()!.trabajo.iva) }}</td></tr>
-            <tr class="border-top bg-light">
-              <td><strong class="fs-5">TOTAL A PAGAR:</strong></td>
-              <td class="text-end"><span class="factura-total">{{ formatearBs(detalle()!.trabajo.total) }}</span></td>
-            </tr>
-          </table>
-        </div>
+      <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+        <table style="width: 50%; border-collapse: collapse;">
+          <tr>
+            <td style="padding: 8px 12px; color: #1a1a1a; font-size: 0.95rem;">Mano de obra:</td>
+            <td style="padding: 8px 12px; color: #1a1a1a; font-size: 0.95rem; text-align: right;">{{ formatearBs(detalle()!.trabajo.costo_mano_obra) }}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 12px; color: #1a1a1a; font-size: 0.95rem;">Repuestos:</td>
+            <td style="padding: 8px 12px; color: #1a1a1a; font-size: 0.95rem; text-align: right;">{{ formatearBs(detalle()!.trabajo.costo_repuestos) }}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 12px; color: #1a1a1a; font-size: 0.95rem;">Descuento:</td>
+            <td style="padding: 8px 12px; color: #d32f2f; font-size: 0.95rem; text-align: right;">- {{ formatearBs(detalle()!.trabajo.descuento) }}</td>
+          </tr>
+          <tr>
+            <td style="padding: 12px; color: #1a1a1a; font-size: 1rem; border-top: 2px solid #d0d0d0;"><strong>Subtotal:</strong></td>
+            <td style="padding: 12px; color: #1a1a1a; font-size: 1rem; text-align: right; border-top: 2px solid #d0d0d0;"><strong>{{ formatearBs(detalle()!.trabajo.subtotal) }}</strong></td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 12px; color: #1a1a1a; font-size: 0.95rem;">IVA (13%):</td>
+            <td style="padding: 8px 12px; color: #1a1a1a; font-size: 0.95rem; text-align: right;">{{ formatearBs(detalle()!.trabajo.iva) }}</td>
+          </tr>
+          <tr style="background-color: #fef5f5;">
+            <td style="padding: 14px 12px; color: #1a1a1a; font-size: 1.1rem; border-top: 2px solid #d32f2f;"><strong>TOTAL A PAGAR:</strong></td>
+            <td style="padding: 14px 12px; text-align: right; border-top: 2px solid #d32f2f;">
+              <span style="color: #d32f2f; font-size: 1.75rem; font-weight: 900;">{{ formatearBs(detalle()!.trabajo.total) }}</span>
+            </td>
+          </tr>
+        </table>
       </div>
 
       <!-- OBSERVACIONES -->
       @if (detalle()!.trabajo.observaciones) {
-        <div class="mt-4 p-3 bg-light rounded">
-          <strong><i class="bi bi-chat-left-text"></i> Observaciones:</strong>
-          <p class="mb-0 mt-1">{{ detalle()!.trabajo.observaciones }}</p>
+        <div style="margin-top: 25px; padding: 16px 20px; background-color: #f8f9fa; border-left: 4px solid #d32f2f; border-radius: 8px;">
+          <strong style="color: #424242; font-size: 0.95rem;">
+            <i class="bi bi-chat-left-text"></i> Observaciones:
+          </strong>
+          <p style="color: #333333; font-size: 0.95rem; margin: 8px 0 0 0;">{{ detalle()!.trabajo.observaciones }}</p>
         </div>
       }
 
       <!-- PIE -->
-      <div class="text-center mt-5 pt-4 border-top">
-        <p class="text-muted mb-0">
-          ¡Gracias por confiar en nosotros!<br />
-          <small>Este documento es una constancia del servicio prestado.</small>
+      <div style="text-align: center; margin-top: 35px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+        <p style="color: #666666; font-size: 0.95rem; margin: 0;">
+          <strong style="color: #333333;">¡Gracias por confiar en nosotros!</strong><br />
+          <small style="color: #888888; font-size: 0.85rem;">Este documento es una constancia del servicio prestado.</small>
         </p>
       </div>
+
     </div>
   }
 </div>

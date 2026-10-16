@@ -1,0 +1,125 @@
+.modal-backdrop-custom {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  z-index: 1040;
+  animation: fadeIn 0.2s;
+}
+
+.modal-custom {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.modal-custom .modal-content {
+  width: 100%;
+  max-width: 900px;
+  background-color: #1c1c20 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+  color: #ffffff;
+  animation: slideDown 0.2s;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-custom .modal-body {
+  background-color: #1c1c20;
+  color: #ffffff;
+}
+
+.modal-custom .modal-footer {
+  background-color: #1c1c20;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.modal-custom .form-label {
+  color: #cccccc !important;
+  font-weight: 500;
+}
+
+.modal-custom .form-control,
+.modal-custom .form-select {
+  background-color: #2a2a2f !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+}
+
+.modal-custom .form-control::placeholder {
+  color: #757575 !important;
+}
+
+.modal-custom .form-control:focus,
+.modal-custom .form-select:focus {
+  background-color: #333338 !important;
+  border-color: #d32f2f !important;
+  box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.15) !important;
+  color: #ffffff !important;
+}
+
+.modal-custom .form-select option {
+  background-color: #1c1c20;
+  color: #ffffff;
+}
+
+.modal-custom textarea.form-control {
+  background-color: #2a2a2f !important;
+  color: #ffffff !important;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-30px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+:host ::ng-deep .table thead th {
+  background-color: #1c1c20 !important;
+  color: #b0b0b0 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  padding: 12px 15px !important;
+  font-size: 0.85rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+}
+
+:host ::ng-deep .table tbody td {
+  background-color: transparent !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
+  padding: 12px 15px !important;
+}
+
+:host ::ng-deep .table tbody tr {
+  background-color: transparent !important;
+}
+
+:host ::ng-deep .table tbody tr:hover td {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+:host ::ng-deep .table-light th {
+  background-color: #1c1c20 !important;
+  color: #b0b0b0 !important;
+}
+
+:host ::ng-deep .badge.bg-info {
+  background-color: rgba(13, 71, 161, 0.4) !important;
+  color: #64b5f6 !important;
+}
+
+:host ::ng-deep .badge.bg-dark {
+  background-color: #212121 !important;
+  color: #ffffff !important;
+}

@@ -36,29 +36,56 @@ exports.obtenerPorTrabajo = async (req, res) => {
 
     // 3. Si no existe informe, crear uno "vacío" con datos del trabajo
     let informe;
-    if (informeResult.rows.length === 0) {
-      informe = {
-        id: null,
-        trabajo_id: Number(trabajoId),
-        kilometraje: 0,
-        nivel_combustible: '1/2',
-        hallazgos: '',
-        recomendaciones: '',
-        proximo_servicio_km: 0,
-        proximo_servicio_fecha: null,
-        firma_tecnico: '',
-        firma_cliente: '',
-        observaciones_entrega: '',
-        fecha_entrega: null,
-        garantia_dias: 30,
-        ...trabajo.rows[0], // Incluye datos del JOIN
-      };
-    } else {
-      informe = {
-        ...informeResult.rows[0],
-        ...trabajo.rows[0], // Añade datos del JOIN
-      };
-    }
+if (informeResult.rows.length === 0) {
+  // Traer datos del vehículo
+  const vehiculo = await pool.query(
+    `SELECT tc.kilometraje, tc.nivel_combustible, tc.tiene_abolladuras, 
+            tc.descripcion_abolladuras, tc.placa
+     FROM tipos_carros tc
+     JOIN trabajos_realizados t ON t.tipo_carro_id = tc.id
+     WHERE t.id = $1`,
+    [trabajoId]
+  );
+
+  const datosVehiculo = vehiculo.rows[0] || {};
+
+  // Traer usuario actual (firma técnico por defecto)
+  const usuarioActual = req.usuario?.nombre || '';
+
+  informe = {
+    id: null,
+    trabajo_id: Number(trabajoId),
+    kilometraje: datosVehiculo.kilometraje || 0,
+    nivel_combustible: datosVehiculo.nivel_combustible || '1/2',
+    hallazgos: datosVehiculo.tiene_abolladuras 
+      ? `Abolladuras: ${datosVehiculo.descripcion_abolladuras || 'Sin detalles'}` 
+      : '',
+    recomendaciones: '',
+    proximo_servicio_km: 0,
+    proximo_servicio_fecha: null,
+    firma_tecnico: usuarioActual,
+    firma_cliente: '',
+    observaciones_entrega: '',
+    fecha_entrega: null,
+    garantia_dias: 30,
+    ...trabajo.rows[0],
+  };
+} else {
+  // Si ya existe, traer los datos más recientes del vehículo también
+  const vehiculo = await pool.query(
+    `SELECT tc.placa
+     FROM tipos_carros tc
+     JOIN trabajos_realizados t ON t.tipo_carro_id = tc.id
+     WHERE t.id = $1`,
+    [trabajoId]
+  );
+
+  informe = {
+    ...informeResult.rows[0],
+    placa: vehiculo.rows[0]?.placa || null,
+    ...trabajo.rows[0],
+  };
+}
 
     // 4. Checklist (vacío si no existe)
     let checklist = [];

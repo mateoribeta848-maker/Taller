@@ -43,6 +43,11 @@ export const routes: Routes = [
           import('./pages/tipos-trabajos/tipos-trabajos.component').then(m => m.TiposTrabajosComponent),
       },
       {
+        path: 'ordenes',
+        loadComponent: () =>
+          import('./pages/ordenes/ordenes.component').then(m => m.OrdenesComponent),
+      },
+      {
         path: 'trabajos',
         loadComponent: () =>
           import('./pages/trabajos/trabajos.component').then(m => m.TrabajosComponent),

@@ -15,7 +15,6 @@ export class CarrosComponent implements OnInit {
 
   carros = signal<Carro[]>([]);
   busqueda = signal<string>('');
-  filtroFreno = signal<string>('todos');
   cargando = signal<boolean>(false);
   error = signal<string | null>(null);
 
@@ -24,27 +23,25 @@ export class CarrosComponent implements OnInit {
 
   carroForm: Carro = this.limpiarForm();
 
-  tiposFreno = ['Disco', 'Tambor', 'ABS', 'Mixto'];
+  nivelesCombustible = ['vacio', '1/4', '1/2', '3/4', 'lleno'];
 
   ngOnInit(): void {
     this.cargar();
   }
 
-  // ============================================
-  // FORMULARIO
-  // ============================================
   limpiarForm(): Carro {
     return {
       marca: '',
       modelo: '',
       anio: new Date().getFullYear(),
-      tipo_freno: 'Disco',
+      placa: '',
+      kilometraje: 0,
+      nivel_combustible: '1/2',
+      tiene_abolladuras: false,
+      descripcion_abolladuras: '',
     };
   }
 
-  // ============================================
-  // CARGAR DATOS
-  // ============================================
   cargar() {
     this.cargando.set(true);
     this.error.set(null);
@@ -61,24 +58,17 @@ export class CarrosComponent implements OnInit {
     });
   }
 
-  // ============================================
-  // GETTERS
-  // ============================================
   get carrosFiltrados(): Carro[] {
     const term = this.busqueda().toLowerCase().trim();
-    const freno = this.filtroFreno();
+    if (!term) return this.carros();
 
-    return this.carros().filter((c) => {
-      const coincideBusqueda =
-        !term ||
+    return this.carros().filter(
+      (c) =>
         c.marca?.toLowerCase().includes(term) ||
         c.modelo?.toLowerCase().includes(term) ||
-        c.anio?.toString().includes(term);
-
-      const coincideFreno = freno === 'todos' || c.tipo_freno === freno;
-
-      return coincideBusqueda && coincideFreno;
-    });
+        c.placa?.toLowerCase().includes(term) ||
+        c.anio?.toString().includes(term)
+    );
   }
 
   get marcasUnicas(): string[] {
@@ -86,9 +76,6 @@ export class CarrosComponent implements OnInit {
     return Array.from(marcas).sort();
   }
 
-  // ============================================
-  // MODAL
-  // ============================================
   abrirCrear() {
     this.carroForm = this.limpiarForm();
     this.editando.set(false);
@@ -106,12 +93,13 @@ export class CarrosComponent implements OnInit {
     this.carroForm = this.limpiarForm();
   }
 
-  // ============================================
-  // GUARDAR
-  // ============================================
   guardar() {
     if (!this.carroForm.marca || !this.carroForm.modelo) {
       alert('⚠️ Marca y modelo son obligatorios');
+      return;
+    }
+    if (!this.carroForm.placa) {
+      alert('⚠️ La placa es obligatoria');
       return;
     }
 
@@ -134,12 +122,9 @@ export class CarrosComponent implements OnInit {
     }
   }
 
-  // ============================================
-  // ELIMINAR
-  // ============================================
   eliminar(c: Carro) {
     if (!c.id) return;
-    if (!confirm(`¿Eliminar ${c.marca} ${c.modelo}?`)) return;
+    if (!confirm(`¿Eliminar ${c.marca} ${c.modelo} (${c.placa})?`)) return;
 
     this.service.eliminar(c.id).subscribe({
       next: () => this.cargar(),
@@ -147,41 +132,34 @@ export class CarrosComponent implements OnInit {
     });
   }
 
-  // ============================================
-  // TRADUCTOR DE ERRORES
-  // ============================================
   private traducirError(err: any): string {
     const msg = err.error?.error || err.message || 'Error desconocido';
-
-    if (msg.includes('duplicate key') || msg.includes('llave duplicada')) {
-      return '⚠️ Ya existe un registro con esos datos.';
-    }
-    if (msg.includes('violates not-null') || msg.includes('null value')) {
-      return '⚠️ Faltan campos obligatorios.';
-    }
-    if (msg.includes('does not exist')) {
-      return '⚠️ Error: la tabla no existe en la base de datos.';
-    }
-    if (msg.includes('ECONNREFUSED') || msg.includes('Network')) {
-      return '⚠️ No se puede conectar al servidor.';
-    }
-    if (msg.includes('Token')) {
-      return '⚠️ Tu sesión expiró. Vuelve a iniciar sesión.';
-    }
-
+    if (msg.includes('duplicate key')) return '⚠️ Ya existe un registro con esos datos.';
+    if (msg.includes('violates not-null')) return '⚠️ Faltan campos obligatorios.';
+    if (msg.includes('ECONNREFUSED') || msg.includes('Network')) return '⚠️ No se puede conectar al servidor.';
+    if (msg.includes('Token')) return '⚠️ Tu sesión expiró. Vuelve a iniciar sesión.';
     return 'Error: ' + msg;
   }
 
-  // ============================================
-  // UTILIDADES
-  // ============================================
-  colorFreno(tipo: string): string {
-    switch (tipo) {
-      case 'Disco':  return 'badge-info';
-      case 'Tambor': return 'badge-warning';
-      case 'ABS':    return 'badge-success';
-      case 'Mixto':  return 'badge-secondary';
-      default:       return 'badge-secondary';
+  nivelCombustibleTexto(nivel: string): string {
+    const niveles: any = {
+      'vacio': 'Vacío',
+      '1/4': '1/4',
+      '1/2': '1/2',
+      '3/4': '3/4',
+      'lleno': 'Lleno',
+    };
+    return niveles[nivel] || nivel;
+  }
+
+  colorCombustible(nivel: string): string {
+    switch (nivel) {
+      case 'vacio': return 'badge-danger';
+      case '1/4':   return 'badge-warning';
+      case '1/2':   return 'badge-info';
+      case '3/4':   return 'badge-success';
+      case 'lleno': return 'badge-success';
+      default:      return 'badge-secondary';
     }
   }
 }

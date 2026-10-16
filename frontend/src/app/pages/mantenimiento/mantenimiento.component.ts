@@ -28,14 +28,81 @@ export class MantenimientoComponent implements OnInit {
   mantenimientoForm: Mantenimiento = this.limpiarForm();
 
   tiposServicio = [
-    'Cambio de pastillas',
-    'Cambio de discos',
-    'Cambio de líquido',
+    // Mantenimiento preventivo
+    'Cambio de aceite de motor',
+    'Cambio de filtro de aire',
+    'Cambio de filtro de combustible',
+    'Cambio de filtro de cabina',
+    'Cambio de bujías',
+    'Cambio de correa de accesorios',
+    'Purgado y cambio de líquido de frenos',
+    'Cambio de líquido refrigerante',
+    'Cambio de líquido de dirección',
+    'Cambio de aceite de transmisión',
+    'Cambio de aceite de diferencial',
+
+    // Frenos
+    'Revisión completa de frenos',
+    'Cambio de pastillas delanteras',
+    'Cambio de pastillas traseras',
+    'Cambio de discos de freno',
+    'Cambio de tambores de freno',
+    'Reparación de sistema ABS',
+
+    // Suspensión y dirección
+    'Alineación de dirección',
+    'Balanceo de ruedas',
+    'Alineación y balanceo',
+    'Cambio de amortiguadores delanteros',
+    'Cambio de amortiguadores traseros',
+    'Cambio de rótulas',
+    'Cambio de terminales de dirección',
+    'Cambio de bujes de suspensión',
+
+    // Motor
+    'Diagnóstico por computadora',
+    'Cambio de correa de distribución',
+    'Cambio de bomba de agua',
+    'Cambio de termostato',
+    'Reparación de culata',
+    'Cambio de empaque de tapa de válvulas',
+    'Reparación de motor completa',
+
+    // Transmisión
+    'Cambio de kit de embrague',
+    'Reparación de caja de cambios',
+    'Cambio de homocinéticas',
+
+    // Eléctrico
+    'Diagnóstico eléctrico',
+    'Cambio de batería',
+    'Reparación de alternador',
+    'Cambio de motor de arranque',
+    'Reparación de luces',
+
+    // Aire acondicionado
+    'Recarga de gas A/C',
+    'Reparación de compresor A/C',
+    'Limpieza de sistema A/C',
+    'Cambio de evaporador A/C',
+
+    // Inyección y combustible
+    'Limpieza de inyectores',
+    'Cambio de bomba de combustible',
+
+    // Carrocería y otros
+    'Cambio de parabrisas',
+    'Reparación de abolladuras',
+    'Pintura completa',
+    'Polarizado de vidrios',
+    'Instalación de alarma',
+    'Instalación de radio',
+
+    // Revisiones
+    'Revisión pre-compra',
+    'Revisión para viaje',
     'Revisión general',
-    'Cambio de tambores',
-    'Purgado de frenos',
-    'Revisión de ABS',
-    'Cambio de mangueras',
+    'Revisión técnica vehicular',
   ];
 
   ngOnInit(): void {
@@ -43,22 +110,16 @@ export class MantenimientoComponent implements OnInit {
     this.cargarCarros();
   }
 
-  // ============================================
-  // FORMULARIO
-  // ============================================
   limpiarForm(): Mantenimiento {
     return {
       tipo_carro_id: 0,
-      tipo_servicio: 'Cambio de pastillas',
+      tipo_servicio: 'Cambio de aceite de motor',
       kilometros: 10000,
       meses: 6,
       descripcion: '',
     };
   }
 
-  // ============================================
-  // CARGAR DATOS
-  // ============================================
   cargar() {
     this.cargando.set(true);
     this.error.set(null);
@@ -82,9 +143,6 @@ export class MantenimientoComponent implements OnInit {
     });
   }
 
-  // ============================================
-  // GETTERS
-  // ============================================
   get mantenimientosFiltrados(): Mantenimiento[] {
     const term = this.busqueda().toLowerCase().trim();
     if (!term) return this.mantenimientos();
@@ -98,12 +156,8 @@ export class MantenimientoComponent implements OnInit {
     );
   }
 
-  // ============================================
-  // MODAL
-  // ============================================
   abrirCrear() {
     this.mantenimientoForm = this.limpiarForm();
-    // Por defecto, selecciona el primer carro si hay
     if (this.carros().length > 0) {
       this.mantenimientoForm.tipo_carro_id = this.carros()[0].id!;
     }
@@ -122,9 +176,6 @@ export class MantenimientoComponent implements OnInit {
     this.mantenimientoForm = this.limpiarForm();
   }
 
-  // ============================================
-  // GUARDAR
-  // ============================================
   guardar() {
     if (!this.mantenimientoForm.tipo_carro_id || this.mantenimientoForm.tipo_carro_id === 0) {
       alert('⚠️ Debes seleccionar un tipo de carro');
@@ -137,26 +188,17 @@ export class MantenimientoComponent implements OnInit {
 
     if (this.editando() && this.mantenimientoForm.id) {
       this.service.actualizar(this.mantenimientoForm.id, this.mantenimientoForm).subscribe({
-        next: () => {
-          this.cargar();
-          this.cerrarModal();
-        },
+        next: () => { this.cargar(); this.cerrarModal(); },
         error: (err) => alert(this.traducirError(err)),
       });
     } else {
       this.service.crear(this.mantenimientoForm).subscribe({
-        next: () => {
-          this.cargar();
-          this.cerrarModal();
-        },
+        next: () => { this.cargar(); this.cerrarModal(); },
         error: (err) => alert(this.traducirError(err)),
       });
     }
   }
 
-  // ============================================
-  // ELIMINAR
-  // ============================================
   eliminar(m: Mantenimiento) {
     if (!m.id) return;
     if (!confirm(`¿Eliminar la frecuencia "${m.tipo_servicio}"?`)) return;
@@ -167,37 +209,16 @@ export class MantenimientoComponent implements OnInit {
     });
   }
 
-  // ============================================
-  // TRADUCTOR DE ERRORES
-  // ============================================
   private traducirError(err: any): string {
     const msg = err.error?.error || err.message || 'Error desconocido';
-
-    if (msg.includes('duplicate key') || msg.includes('llave duplicada')) {
-      return '⚠️ Ya existe un registro con esos datos.';
-    }
-    if (msg.includes('violates not-null') || msg.includes('null value')) {
-      return '⚠️ Faltan campos obligatorios.';
-    }
-    if (msg.includes('foreign key') || msg.includes('violates foreign')) {
-      return '⚠️ El tipo de carro seleccionado no existe.';
-    }
-    if (msg.includes('does not exist')) {
-      return '⚠️ Error: la tabla no existe en la base de datos.';
-    }
-    if (msg.includes('ECONNREFUSED') || msg.includes('Network')) {
-      return '⚠️ No se puede conectar al servidor.';
-    }
-    if (msg.includes('Token')) {
-      return '⚠️ Tu sesión expiró. Vuelve a iniciar sesión.';
-    }
-
+    if (msg.includes('duplicate key')) return '⚠️ Ya existe un registro con esos datos.';
+    if (msg.includes('violates not-null')) return '⚠️ Faltan campos obligatorios.';
+    if (msg.includes('foreign key')) return '⚠️ El tipo de carro seleccionado no existe.';
+    if (msg.includes('ECONNREFUSED') || msg.includes('Network')) return '⚠️ No se puede conectar al servidor.';
+    if (msg.includes('Token')) return '⚠️ Tu sesión expiró. Vuelve a iniciar sesión.';
     return 'Error: ' + msg;
   }
 
-  // ============================================
-  // UTILIDADES
-  // ============================================
   getNombreCarro(carroId: number): string {
     const c = this.carros().find((x) => x.id === carroId);
     return c ? `${c.marca} ${c.modelo}` : `Carro #${carroId}`;

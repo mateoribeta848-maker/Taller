@@ -1,42 +1,26 @@
-<!-- ============================================ -->
-<!-- TABLA DE CARROS                               -->
-<!-- ============================================ -->
 <div class="card-table">
   <div class="card-header">
     <div>
       <h4 class="m-0">
         <i class="bi bi-car-front-fill text-danger"></i> Tipos de Carros
       </h4>
-      <small class="text-muted">Marcas y modelos registrados</small>
+      <small class="text-muted">Vehículos registrados del taller</small>
     </div>
 
     <div class="d-flex gap-2 flex-wrap">
-      <select
-        class="form-select"
-        style="width: 160px;"
-        [value]="filtroFreno()"
-        (change)="filtroFreno.set($any($event.target).value)"
-      >
-        <option value="todos">Todos los frenos</option>
-        <option value="Disco">Disco</option>
-        <option value="Tambor">Tambor</option>
-        <option value="ABS">ABS</option>
-        <option value="Mixto">Mixto</option>
-      </select>
-
-      <div class="input-group" style="width: 250px;">
+      <div class="input-group" style="width: 280px;">
         <span class="input-group-text"><i class="bi bi-search"></i></span>
         <input
           type="text"
           class="form-control"
-          placeholder="Buscar marca o modelo..."
+          placeholder="Buscar marca, modelo o placa..."
           [value]="busqueda()"
           (input)="busqueda.set($any($event.target).value)"
         />
       </div>
 
       <button class="btn btn-primary" (click)="abrirCrear()">
-        <i class="bi bi-plus-lg"></i> Nuevo Carro
+        <i class="bi bi-plus-lg"></i> Nuevo Vehículo
       </button>
     </div>
   </div>
@@ -44,7 +28,7 @@
   @if (cargando()) {
     <div class="text-center p-5">
       <div class="spinner-border text-danger"></div>
-      <p class="mt-2 text-muted">Cargando carros...</p>
+      <p class="mt-2 text-muted">Cargando vehículos...</p>
     </div>
   }
 
@@ -59,11 +43,14 @@
       <table class="table table-hover align-middle">
         <thead>
           <tr>
-            <th style="width: 60px;">ID</th>
+            <th style="width: 50px;">ID</th>
             <th>Marca</th>
             <th>Modelo</th>
             <th class="text-center">Año</th>
-            <th class="text-center">Tipo de Freno</th>
+            <th class="text-center">Placa</th>
+            <th class="text-center">Kilometraje</th>
+            <th class="text-center">Combustible</th>
+            <th class="text-center">Abolladuras</th>
             <th style="width: 130px;" class="text-center">Acciones</th>
           </tr>
         </thead>
@@ -80,23 +67,42 @@
                 <span class="badge bg-dark">{{ c.anio || '-' }}</span>
               </td>
               <td class="text-center">
-                <span class="badge-estado" [class]="colorFreno(c.tipo_freno)">
-                  {{ c.tipo_freno }}
+                @if (c.placa) {
+                  <span class="badge bg-info text-dark">{{ c.placa }}</span>
+                } @else {
+                  <span class="text-muted">-</span>
+                }
+              </td>
+              <td class="text-center">
+                @if (c.kilometraje && c.kilometraje > 0) {
+                  <span class="badge bg-secondary">
+                    <i class="bi bi-speedometer2"></i> {{ c.kilometraje | number }} km
+                  </span>
+                } @else {
+                  <span class="text-muted">-</span>
+                }
+              </td>
+              <td class="text-center">
+                <span class="badge-estado" [class]="colorCombustible(c.nivel_combustible)">
+                  <i class="bi bi-fuel-pump"></i> {{ nivelCombustibleTexto(c.nivel_combustible) }}
                 </span>
               </td>
               <td class="text-center">
-                <button
-                  class="btn btn-sm btn-outline-warning me-1"
-                  (click)="abrirEditar(c)"
-                  title="Editar"
-                >
+                @if (c.tiene_abolladuras) {
+                  <span class="badge bg-danger" [title]="c.descripcion_abolladuras || ''">
+                    <i class="bi bi-exclamation-triangle-fill"></i> Sí
+                  </span>
+                } @else {
+                  <span class="badge bg-success">
+                    <i class="bi bi-check-lg"></i> No
+                  </span>
+                }
+              </td>
+              <td class="text-center">
+                <button class="btn btn-sm btn-outline-warning me-1" (click)="abrirEditar(c)" title="Editar">
                   <i class="bi bi-pencil"></i>
                 </button>
-                <button
-                  class="btn btn-sm btn-outline-danger"
-                  (click)="eliminar(c)"
-                  title="Eliminar"
-                >
+                <button class="btn btn-sm btn-outline-danger" (click)="eliminar(c)" title="Eliminar">
                   <i class="bi bi-trash"></i>
                 </button>
               </td>
@@ -105,9 +111,9 @@
 
           @if (carrosFiltrados.length === 0) {
             <tr>
-              <td colspan="6" class="text-center text-muted py-4">
+              <td colspan="9" class="text-center text-muted py-4">
                 <i class="bi bi-inbox fs-2 d-block mb-2"></i>
-                No hay carros que coincidan
+                No hay vehículos registrados
               </td>
             </tr>
           }
@@ -117,9 +123,6 @@
   }
 </div>
 
-<!-- ============================================ -->
-<!-- MODAL CREAR/EDITAR                            -->
-<!-- ============================================ -->
 @if (mostrarModal()) {
   <div class="modal-backdrop-custom" (click)="cerrarModal()"></div>
   <div class="modal-custom">
@@ -127,7 +130,7 @@
       <div class="modal-header bg-danger text-white">
         <h5 class="modal-title">
           <i class="bi" [class]="editando() ? 'bi-pencil-square' : 'bi-plus-circle'"></i>
-          {{ editando() ? 'Editar Carro' : 'Nuevo Carro' }}
+          {{ editando() ? 'Editar Vehículo' : 'Nuevo Vehículo' }}
         </h5>
         <button class="btn-close btn-close-white" (click)="cerrarModal()"></button>
       </div>
@@ -160,7 +163,7 @@
             />
           </div>
 
-          <div class="col-md-6">
+          <div class="col-md-4">
             <label class="form-label">Año</label>
             <input
               type="number"
@@ -171,14 +174,67 @@
             />
           </div>
 
+          <div class="col-md-4">
+            <label class="form-label">Placa *</label>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="carroForm.placa"
+              placeholder="Ej: 1234ABC"
+              style="text-transform: uppercase;"
+            />
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Kilometraje (km)</label>
+            <div class="input-group">
+              <input
+                type="number"
+                class="form-control"
+                [(ngModel)]="carroForm.kilometraje"
+                min="0"
+                step="1000"
+              />
+              <span class="input-group-text">km</span>
+            </div>
+          </div>
+
           <div class="col-md-6">
-            <label class="form-label">Tipo de freno</label>
-            <select class="form-select" [(ngModel)]="carroForm.tipo_freno">
-              @for (t of tiposFreno; track t) {
-                <option [value]="t">{{ t }}</option>
-              }
+            <label class="form-label">Nivel de combustible al ingreso</label>
+            <select class="form-select" [(ngModel)]="carroForm.nivel_combustible">
+              <option value="vacio">Vacío</option>
+              <option value="1/4">1/4</option>
+              <option value="1/2">1/2</option>
+              <option value="3/4">3/4</option>
+              <option value="lleno">Lleno</option>
             </select>
           </div>
+
+          <div class="col-md-6">
+            <label class="form-label">¿Tiene abolladuras?</label>
+            <div style="display: flex; gap: 15px; align-items: center; padding: 8px 0;">
+              <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; margin: 0; color: #cccccc;">
+                <input type="radio" [value]="true" [(ngModel)]="carroForm.tiene_abolladuras" name="abolladuras" />
+                Sí
+              </label>
+              <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; margin: 0; color: #cccccc;">
+                <input type="radio" [value]="false" [(ngModel)]="carroForm.tiene_abolladuras" name="abolladuras" />
+                No
+              </label>
+            </div>
+          </div>
+
+          @if (carroForm.tiene_abolladuras) {
+            <div class="col-12">
+              <label class="form-label">Descripción de las abolladuras</label>
+              <textarea
+                class="form-control"
+                rows="3"
+                [(ngModel)]="carroForm.descripcion_abolladuras"
+                placeholder="Ej: Abolladura en puerta trasera derecha..."
+              ></textarea>
+            </div>
+          }
         </div>
       </div>
 

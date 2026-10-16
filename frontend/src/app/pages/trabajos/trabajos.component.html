@@ -95,7 +95,6 @@
                 {{ formatearBs(t.total) }}
               </td>
               <td class="text-center">
-                <!-- Ver factura -->
                 <button
                   class="btn btn-sm btn-outline-info me-1"
                   (click)="verDetalle(t)"
@@ -103,8 +102,6 @@
                 >
                   <i class="bi bi-receipt"></i>
                 </button>
-
-                <!-- Ver informe -->
                 <button
                   class="btn btn-sm btn-outline-primary me-1"
                   (click)="verInforme(t)"
@@ -112,8 +109,6 @@
                 >
                   <i class="bi bi-clipboard-check"></i>
                 </button>
-
-                <!-- Eliminar -->
                 <button
                   class="btn btn-sm btn-outline-danger"
                   (click)="eliminar(t)"
@@ -284,19 +279,37 @@
                     @for (r of repuestosSeleccionados; track $index) {
                       <tr>
                         <td>
-                          <select class="form-select form-select-sm" [(ngModel)]="r.repuesto_id" (change)="cambiarRepuesto($index)">
+                          <select
+                            class="form-select form-select-sm"
+                            [ngModel]="r.repuesto_id"
+                            (ngModelChange)="cambiarRepuestoPorId($index, $event)"
+                          >
                             @for (rep of repuestosDisponibles(); track rep.id) {
-                              <option [value]="rep.id">{{ rep.codigo }} - {{ rep.nombre }} (stock: {{ rep.stock }})</option>
+                              <option [value]="rep.id">
+                                {{ rep.codigo }} - {{ rep.nombre }} (stock: {{ rep.stock }})
+                              </option>
                             }
                           </select>
                         </td>
                         <td>
-                          <input type="number" class="form-control form-control-sm" [(ngModel)]="r.cantidad" min="1" />
+                          <input
+                            type="number"
+                            class="form-control form-control-sm"
+                            [(ngModel)]="r.cantidad"
+                            min="1"
+                          />
                         </td>
-                        <td class="text-end align-middle">{{ formatearBs(r.precio_unitario) }}</td>
-                        <td class="text-end align-middle"><strong>{{ formatearBs((r.precio_unitario || 0) * r.cantidad) }}</strong></td>
+                        <td class="text-end align-middle">
+                          {{ formatearBs(r.precio_unitario) }}
+                        </td>
+                        <td class="text-end align-middle">
+                          <strong>{{ formatearBs((r.precio_unitario || 0) * r.cantidad) }}</strong>
+                        </td>
                         <td class="text-center">
-                          <button class="btn btn-sm btn-outline-danger" (click)="eliminarRepuesto($index)">
+                          <button
+                            class="btn btn-sm btn-outline-danger"
+                            (click)="eliminarRepuesto($index)"
+                          >
                             <i class="bi bi-x"></i>
                           </button>
                         </td>
@@ -311,26 +324,62 @@
           <!-- Mano de obra y descuento -->
           <div class="col-md-6">
             <label class="form-label">Mano de obra (Bs)</label>
-            <input type="number" class="form-control" [(ngModel)]="trabajoForm.costo_mano_obra" min="0" step="0.01" />
+            <input
+              type="number"
+              class="form-control"
+              [(ngModel)]="trabajoForm.costo_mano_obra"
+              min="0"
+              step="0.01"
+            />
           </div>
 
           <div class="col-md-6">
             <label class="form-label">Descuento (Bs)</label>
-            <input type="number" class="form-control" [(ngModel)]="trabajoForm.descuento" min="0" step="0.01" />
+            <input
+              type="number"
+              class="form-control"
+              [(ngModel)]="trabajoForm.descuento"
+              min="0"
+              step="0.01"
+            />
           </div>
 
-          <!-- Totales -->
+          <!-- Resumen de totales -->
           <div class="col-12">
             <div class="totales-box">
               <div class="row">
                 <div class="col-md-6 offset-md-6">
                   <table class="table table-sm mb-0">
-                    <tr><td>Mano de obra:</td><td class="text-end">{{ formatearBs(trabajoForm.costo_mano_obra) }}</td></tr>
-                    <tr><td>Repuestos:</td><td class="text-end">{{ formatearBs(costoRepuestosCalculado) }}</td></tr>
-                    <tr><td>Descuento:</td><td class="text-end text-danger">- {{ formatearBs(trabajoForm.descuento) }}</td></tr>
-                    <tr class="border-top"><td><strong>Subtotal:</strong></td><td class="text-end"><strong>{{ formatearBs(subtotalCalculado) }}</strong></td></tr>
-                    <tr><td>IVA (13%):</td><td class="text-end">{{ formatearBs(ivaCalculado) }}</td></tr>
-                    <tr class="border-top bg-light"><td><strong class="fs-5">TOTAL:</strong></td><td class="text-end"><strong class="fs-4 text-danger">{{ formatearBs(totalCalculado) }}</strong></td></tr>
+                    <tr>
+                      <td>Mano de obra:</td>
+                      <td class="text-end">{{ formatearBs(trabajoForm.costo_mano_obra) }}</td>
+                    </tr>
+                    <tr>
+                      <td>Repuestos:</td>
+                      <td class="text-end">{{ formatearBs(costoRepuestosCalculado) }}</td>
+                    </tr>
+                    <tr>
+                      <td>Descuento:</td>
+                      <td class="text-end text-danger">- {{ formatearBs(trabajoForm.descuento) }}</td>
+                    </tr>
+                    <tr class="fila-subtotal">
+                      <td><strong>Subtotal:</strong></td>
+                      <td class="text-end">
+                        <strong>{{ formatearBs(subtotalCalculado) }}</strong>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>IVA (13%):</td>
+                      <td class="text-end">{{ formatearBs(ivaCalculado) }}</td>
+                    </tr>
+                    <tr class="fila-total">
+                      <td><strong class="fs-5">TOTAL:</strong></td>
+                      <td class="text-end">
+                        <strong class="text-danger" style="font-size: 1.5rem;">
+                          {{ formatearBs(totalCalculado) }}
+                        </strong>
+                      </td>
+                    </tr>
                   </table>
                 </div>
               </div>

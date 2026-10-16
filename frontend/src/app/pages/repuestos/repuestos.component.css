@@ -1,10 +1,10 @@
-/* Los estilos del modal están en clientes.component.css, pero como cada
-   componente es independiente, los repetimos aquí. */
-
+/* ============================================
+   MODAL PERSONALIZADO
+   ============================================ */
 .modal-backdrop-custom {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.75);
   z-index: 1040;
   animation: fadeIn 0.2s;
 }
@@ -22,17 +22,58 @@
 .modal-custom .modal-content {
   width: 100%;
   max-width: 700px;
+  background-color: #1c1c20;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+  color: #ffffff;
   animation: slideDown 0.2s;
 }
 
 @keyframes fadeIn {
   from { opacity: 0; }
-  to { opacity: 1; }
+  to   { opacity: 1; }
 }
 
 @keyframes slideDown {
   from { transform: translateY(-30px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+/* ============================================
+   FORZAR TABLAS OSCURAS
+   ============================================ */
+:host ::ng-deep .table thead th {
+  background-color: #1c1c20 !important;
+  color: #b0b0b0 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  padding: 12px 15px !important;
+  font-size: 0.85rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+}
+
+:host ::ng-deep .table tbody td {
+  background-color: transparent !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
+  padding: 12px 15px !important;
+}
+
+:host ::ng-deep .table tbody tr {
+  background-color: transparent !important;
+}
+
+:host ::ng-deep .table tbody tr:hover td {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+:host ::ng-deep .table-light th {
+  background-color: #1c1c20 !important;
+  color: #b0b0b0 !important;
+}
+
+:host ::ng-deep .table-warning,
+:host ::ng-deep .table-warning > td {
+  background-color: rgba(237, 108, 2, 0.08) !important;
 }

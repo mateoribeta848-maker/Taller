@@ -1,19 +1,24 @@
 <div class="login-page">
+  <div class="login-overlay"></div>
+
   <div class="login-card">
-    <div class="login-logo">🚗</div>
-    <h2 class="login-title">DemonCar</h2>
+    <!-- IMAGEN DEL AUTO DEPORTIVO -->
+    <div class="login-logo">
+      <img src="/car-logo.png" alt="DemonCar" class="car-logo-img" />
+    </div>
+
+    <h1 class="login-title">DemonCar</h1>
     <p class="login-subtitle">Taller Automotriz</p>
 
     <form (ngSubmit)="onSubmit()">
-      <div class="mb-3">
-        <label for="email" class="form-label">Correo electrónico</label>
-        <div class="input-group">
-          <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+      <div class="form-group">
+        <label class="form-label">Correo electrónico</label>
+        <div class="input-wrapper">
+          <i class="bi bi-envelope input-icon"></i>
           <input
             type="email"
-            id="email"
-            class="form-control"
-            placeholder="tu@email.com"
+            class="form-input"
+            placeholder="correo@ejemplo.com"
             [(ngModel)]="email"
             name="email"
             required
@@ -21,31 +26,38 @@
         </div>
       </div>
 
-      <div class="mb-3">
-        <label for="password" class="form-label">Contraseña</label>
-        <div class="input-group">
-          <span class="input-group-text"><i class="bi bi-lock"></i></span>
+      <div class="form-group">
+        <label class="form-label">Contraseña</label>
+        <div class="input-wrapper">
+          <i class="bi bi-lock input-icon"></i>
           <input
-            type="password"
-            id="password"
-            class="form-control"
+            [type]="mostrarPassword() ? 'text' : 'password'"
+            class="form-input"
             placeholder="••••••••"
             [(ngModel)]="password"
             name="password"
             required
           />
+          <button
+            type="button"
+            class="input-icon-right"
+            (click)="togglePassword()"
+            tabindex="-1"
+          >
+            <i class="bi" [class]="mostrarPassword() ? 'bi-eye-slash' : 'bi-eye'"></i>
+          </button>
         </div>
       </div>
 
       @if (error()) {
-        <div class="alert alert-danger py-2">
-          <i class="bi bi-exclamation-triangle"></i> {{ error() }}
+        <div class="error-box">
+          <i class="bi bi-exclamation-triangle-fill"></i> {{ error() }}
         </div>
       }
 
       <button
         type="submit"
-        class="btn btn-primary w-100 py-2"
+        class="btn-login"
         [disabled]="cargando()"
       >
         @if (cargando()) {
@@ -58,8 +70,9 @@
       </button>
     </form>
 
-    <div class="text-center mt-4 text-muted" style="font-size: 0.8rem;">
-      <i class="bi bi-info-circle"></i> Usuario: admin&#64;taller.com / admin123
+    <div class="login-footer">
+      <i class="bi bi-info-circle"></i>
+      Usuario: admin&#64;taller.com / admin123
     </div>
   </div>
 </div>

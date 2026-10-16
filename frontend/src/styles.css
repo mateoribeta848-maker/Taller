@@ -1,59 +1,93 @@
 /* ============================================
-   ESTILOS GLOBALES - TALLER DE FRENOS
+   DEMONCAR - ESTILOS GLOBALES (TEMA OSCURO)
    ============================================ */
 
 :root {
-  --color-primary: #d32f2f;       /* Rojo (frenos) */
-  --color-secondary: #212121;      /* Gris oscuro */
-  --color-success: #2e7d32;
-  --color-warning: #ed6c02;
-  --color-danger: #d32f2f;
-  --color-info: #0288d1;
+  --color-primary: #d32f2f;
+  --color-secondary: #212121;
   --sidebar-width: 250px;
   --topbar-height: 60px;
+
+  --bg-main: #121216;
+  --bg-card: #1c1c20;
+  --bg-hover: rgba(255, 255, 255, 0.04);
+  --bg-input: rgba(45, 45, 50, 0.6);
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --text-primary: #ffffff;
+  --text-secondary: #b0b0b0;
+  --text-muted: #9e9e9e;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 html, body {
   height: 100%;
   margin: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f4f6f8;
-  color: #212529;
+  background-color: #121216;
+  color: #ffffff;
 }
 
-/* ---------- Layout principal ---------- */
+/* ============================================
+   LAYOUT PRINCIPAL
+   ============================================ */
 .app-container {
   display: flex;
   min-height: 100vh;
+  background-color: #121216;
 }
 
 .sidebar {
-  width: var(--sidebar-width);
-  background-color: var(--color-secondary);
+  width: 250px;
+  background-color: #0a0a0c;
   color: white;
   display: flex;
   flex-direction: column;
   position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
+  top: 0; bottom: 0; left: 0;
   z-index: 100;
-  transition: all 0.3s;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+/* ============================================
+   HEADER DEL SIDEBAR CON LOGO
+   ============================================ */
 .sidebar-header {
-  padding: 20px;
+  padding: 18px 15px;
   font-size: 1.2rem;
   font-weight: bold;
-  background-color: rgba(0,0,0,0.2);
+  background-color: rgba(0, 0, 0, 0.3);
   text-align: center;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
+/* LOGO CON TAMAÑO FIJO (evita que se vea gigante) */
+.sidebar-header .logo-sidebar {
+  width: 36px !important;
+  height: 36px !important;
+  max-width: 36px !important;
+  max-height: 36px !important;
+  object-fit: contain !important;
+  display: inline-block !important;
+  flex-shrink: 0 !important;
+  filter: drop-shadow(0 2px 6px rgba(211, 47, 47, 0.5));
+}
+
+.sidebar-header span {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+/* ============================================
+   MENÚ LATERAL
+   ============================================ */
 .sidebar-menu {
   list-style: none;
   padding: 10px 0;
@@ -67,40 +101,42 @@ html, body {
   align-items: center;
   gap: 12px;
   padding: 12px 20px;
-  color: #b0bec5;
+  color: #9e9e9e;
   text-decoration: none;
-  transition: all 0.2s;
   border-left: 3px solid transparent;
   font-size: 0.95rem;
+  transition: all 0.2s;
 }
 
 .sidebar-menu li a:hover {
-  background-color: rgba(255,255,255,0.05);
+  background-color: rgba(255, 255, 255, 0.05);
   color: white;
 }
 
 .sidebar-menu li a.active {
   background-color: rgba(211, 47, 47, 0.15);
   color: white;
-  border-left-color: var(--color-primary);
+  border-left-color: #d32f2f;
 }
 
-.sidebar-menu li a i {
-  font-size: 1.2rem;
-}
+.sidebar-menu li a i { font-size: 1.2rem; }
 
+/* ============================================
+   CONTENIDO PRINCIPAL
+   ============================================ */
 .main-content {
-  margin-left: var(--sidebar-width);
+  margin-left: 250px;
   flex: 1;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  background-color: #121216;
 }
 
 .topbar {
-  height: var(--topbar-height);
-  background-color: white;
-  border-bottom: 1px solid #e0e0e0;
+  height: 60px;
+  background-color: #1c1c20;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -108,44 +144,72 @@ html, body {
   position: sticky;
   top: 0;
   z-index: 99;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  color: #ffffff;
 }
+
+.topbar h5 { color: #ffffff !important; }
+.topbar .text-muted { color: #9e9e9e !important; }
+
+.topbar .btn-light {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+}
+
+.topbar .btn-light:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.topbar .dropdown-menu {
+  background-color: #1c1c20;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.topbar .dropdown-item { color: #ffffff; }
+
+.topbar .dropdown-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+.topbar .dropdown-header { color: #9e9e9e; }
+.topbar .dropdown-divider { border-color: rgba(255, 255, 255, 0.08); }
 
 .page-content {
   padding: 25px;
   flex: 1;
+  background-color: #121216;
 }
 
-/* ---------- Tarjetas de estadísticas ---------- */
+/* ============================================
+   TARJETAS DE ESTADÍSTICAS
+   ============================================ */
 .stat-card {
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   color: white;
   padding: 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
   transition: transform 0.2s;
 }
 
-.stat-card:hover {
-  transform: translateY(-3px);
-}
-
-.stat-card .stat-icon {
-  font-size: 2.5rem;
-  opacity: 0.4;
-}
-
-.stat-card .stat-value {
-  font-size: 2rem;
-  font-weight: bold;
-  margin: 5px 0;
-}
-
+.stat-card:hover { transform: translateY(-3px); }
+.stat-card .stat-icon { font-size: 2.5rem; opacity: 0.4; }
+.stat-card .stat-value { font-size: 2rem; font-weight: bold; margin: 5px 0; }
 .stat-card .stat-label {
   font-size: 0.9rem;
   opacity: 0.9;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+.stat-card .stat-link {
+  color: white;
+  text-decoration: none;
+  font-size: 0.8rem;
+  opacity: 0.85;
+  display: inline-block;
+  margin-top: 10px;
 }
 
 .bg-gradient-red    { background: linear-gradient(135deg, #d32f2f, #b71c1c); }
@@ -154,55 +218,143 @@ html, body {
 .bg-gradient-orange { background: linear-gradient(135deg, #f57c00, #e65100); }
 .bg-gradient-purple { background: linear-gradient(135deg, #7b1fa2, #4a148c); }
 
-/* ---------- Tablas ---------- */
+/* ============================================
+   TARJETAS CON TABLA
+   ============================================ */
 .card-table {
-  background: white;
+  background: #1c1c20;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   overflow: hidden;
+  color: #ffffff;
 }
 
 .card-table .card-header {
-  background: white;
-  border-bottom: 1px solid #e0e0e0;
+  background: #1c1c20;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   padding: 18px 22px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  color: #ffffff;
 }
 
-.card-table table {
+.card-table .card-header h4,
+.card-table .card-header h5 { color: #ffffff; }
+
+/* ============================================
+   TABLAS
+   ============================================ */
+.table {
   margin: 0;
+  color: #ffffff !important;
+  --bs-table-bg: transparent;
+  --bs-table-color: #ffffff;
+  --bs-table-border-color: rgba(255, 255, 255, 0.05);
+  --bs-table-striped-bg: rgba(255, 255, 255, 0.02);
+  --bs-table-hover-bg: rgba(255, 255, 255, 0.04);
 }
 
-.card-table table thead {
-  background-color: #f8f9fa;
+.table > :not(caption) > * > * {
+  background-color: transparent !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
 }
 
+.table thead th,
+.table > thead > tr > th,
 .card-table table thead th {
-  font-weight: 600;
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: #616161;
-  border-bottom: 1px solid #e0e0e0;
-  padding: 12px 15px;
+  background-color: #1c1c20 !important;
+  color: #b0b0b0 !important;
+  font-weight: 600 !important;
+  font-size: 0.85rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  padding: 12px 15px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-top: none !important;
 }
 
-.card-table table tbody td {
-  padding: 12px 15px;
-  vertical-align: middle;
-  border-color: #f0f0f0;
+.table tbody td {
+  background-color: transparent !important;
+  color: #ffffff !important;
+  padding: 12px 15px !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
+  vertical-align: middle !important;
 }
 
-.card-table table tbody tr:hover {
-  background-color: #f8f9fa;
+.table tbody tr { background-color: transparent !important; }
+
+.table tbody tr:hover,
+.table tbody tr:hover > td {
+  background-color: rgba(255, 255, 255, 0.04) !important;
 }
 
-/* ---------- Botones ---------- */
+.table-light,
+.table-light > th,
+.table-light > td,
+.table > .table-light > * {
+  background-color: #1c1c20 !important;
+  color: #b0b0b0 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.table-bordered,
+.table-bordered > :not(caption) > * > * {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.table-warning,
+.table-warning > td,
+.table-warning > th {
+  background-color: rgba(237, 108, 2, 0.08) !important;
+  color: #ffffff !important;
+}
+
+.table tbody td[colspan] {
+  color: #9e9e9e !important;
+  background-color: transparent !important;
+}
+
+/* ============================================
+   FORMULARIOS
+   ============================================ */
+.form-control, .form-select {
+  background-color: rgba(45, 45, 50, 0.6);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.form-control::placeholder { color: #757575; }
+
+.form-control:focus, .form-select:focus {
+  background-color: rgba(55, 55, 60, 0.8);
+  border-color: #d32f2f;
+  box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.15);
+  color: #ffffff;
+}
+
+.form-label { color: #cccccc; }
+
+.form-select option {
+  background-color: #1c1c20;
+  color: #ffffff;
+}
+
+.input-group-text {
+  background-color: rgba(45, 45, 50, 0.8);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  color: #b0b0b0;
+}
+
+/* ============================================
+   BOTONES
+   ============================================ */
 .btn-primary {
-  background-color: var(--color-primary);
-  border-color: var(--color-primary);
+  background-color: #d32f2f;
+  border-color: #d32f2f;
+  color: white;
 }
 
 .btn-primary:hover {
@@ -210,46 +362,37 @@ html, body {
   border-color: #b71c1c;
 }
 
-/* ---------- Login ---------- */
-.login-page {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #212121 0%, #d32f2f 100%);
-  padding: 20px;
+.btn-secondary {
+  background-color: #424242;
+  border-color: #424242;
+  color: #ffffff;
 }
 
-.login-card {
-  width: 100%;
-  max-width: 420px;
-  background: white;
-  border-radius: 16px;
-  padding: 40px 35px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+.btn-secondary:hover {
+  background-color: #555555;
+  border-color: #555555;
 }
 
-.login-logo {
-  font-size: 3rem;
-  text-align: center;
-  margin-bottom: 10px;
+.btn-outline-secondary {
+  color: #b0b0b0;
+  border-color: #424242;
 }
 
-.login-title {
-  text-align: center;
-  font-weight: bold;
-  color: #212121;
-  margin-bottom: 5px;
-}
+.btn-outline-warning { color: #ffb74d; border-color: #ffb74d; }
+.btn-outline-warning:hover { background-color: #ffb74d; color: #212121; }
 
-.login-subtitle {
-  text-align: center;
-  color: #757575;
-  margin-bottom: 30px;
-  font-size: 0.9rem;
-}
+.btn-outline-danger { color: #ff5252; border-color: #ff5252; }
+.btn-outline-danger:hover { background-color: #ff5252; color: #ffffff; }
 
-/* ---------- Badges de estado ---------- */
+.btn-outline-info { color: #64b5f6; border-color: #64b5f6; }
+.btn-outline-info:hover { background-color: #64b5f6; color: #ffffff; }
+
+.btn-outline-primary { color: #90caf9; border-color: #90caf9; }
+.btn-outline-primary:hover { background-color: #90caf9; color: #121216; }
+
+/* ============================================
+   BADGES
+   ============================================ */
 .badge-estado {
   padding: 5px 12px;
   border-radius: 20px;
@@ -257,40 +400,144 @@ html, body {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  display: inline-block;
 }
 
-.badge-pendiente  { background-color: #fff3e0; color: #e65100; }
-.badge-en_proceso { background-color: #e3f2fd; color: #0d47a1; }
-.badge-finalizado { background-color: #e8f5e9; color: #1b5e20; }
+.badge-pendiente  { background-color: rgba(230, 81, 0, 0.2); color: #ffb74d; }
+.badge-en_proceso { background-color: rgba(13, 71, 161, 0.25); color: #64b5f6; }
+.badge-finalizado { background-color: rgba(27, 94, 32, 0.25); color: #81c784; }
+.badge-secondary  { background-color: #424242; color: #e0e0e0; }
 
-/* ---------- Factura ---------- */
-.factura-container {
-  background: white;
-  max-width: 800px;
-  margin: 20px auto;
-  padding: 40px;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+.badge.bg-secondary { background-color: #424242 !important; color: #e0e0e0; }
+.badge.bg-danger    { background-color: #d32f2f !important; }
+.badge.bg-dark      { background-color: #212121 !important; }
+.badge.bg-info      { background-color: #0288d1 !important; color: #ffffff; }
+.badge.bg-success   { background-color: #2e7d32 !important; }
+
+/* ============================================
+   MODALES
+   ============================================ */
+.modal-backdrop-custom {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  z-index: 1040;
+  animation: fadeIn 0.2s;
 }
 
-.factura-header {
+.modal-custom {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  border-bottom: 3px solid var(--color-primary);
-  padding-bottom: 20px;
-  margin-bottom: 20px;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
 }
 
-.factura-total {
-  font-size: 1.8rem;
-  font-weight: bold;
-  color: var(--color-primary);
+.modal-custom .modal-content {
+  width: 100%;
+  max-width: 600px;
+  background-color: #1c1c20;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+  color: #ffffff;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
-@media print {
-  .no-print { display: none !important; }
-  .sidebar, .topbar { display: none !important; }
-  .main-content { margin-left: 0 !important; }
-  .factura-container { box-shadow: none; }
-}/* You can add global styles to this file, and also import other style files */
+.modal-custom .modal-content.modal-lg { max-width: 900px; }
+.modal-custom .modal-body { color: #ffffff; }
+.modal-custom .modal-footer { border-top: 1px solid rgba(255, 255, 255, 0.08); }
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-30px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+/* ============================================
+   ALERTAS
+   ============================================ */
+.alert-danger {
+  background-color: rgba(198, 40, 40, 0.15);
+  border-color: rgba(198, 40, 40, 0.3);
+  color: #ff5252;
+}
+
+.alert-warning {
+  background-color: rgba(237, 108, 2, 0.15);
+  border-color: rgba(237, 108, 2, 0.3);
+  color: #ffb74d;
+}
+
+.alert-success {
+  background-color: rgba(46, 125, 50, 0.15);
+  border-color: rgba(46, 125, 50, 0.3);
+  color: #81c784;
+}
+
+.alert-secondary {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #b0b0b0;
+}
+
+/* ============================================
+   LIST GROUP
+   ============================================ */
+.list-group-item {
+  background-color: transparent;
+  border-color: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+/* ============================================
+   TEXTOS
+   ============================================ */
+.text-muted { color: #9e9e9e !important; }
+h1, h2, h3, h4, h5, h6 { color: #ffffff; }
+p { color: #b0b0b0; }
+small { color: #9e9e9e; }
+code { color: #ff8a80; }
+strong { color: #ffffff; }
+
+/* ============================================
+   DROPDOWN MENU
+   ============================================ */
+.dropdown-menu {
+  background-color: #1c1c20;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.dropdown-item { color: #ffffff; }
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+.dropdown-divider { border-color: rgba(255, 255, 255, 0.08); }
+.dropdown-header { color: #9e9e9e; }
+
+/* ============================================
+   OCULTAR SIDEBAR Y TOPBAR EN VISTAS DEDICADAS
+   ============================================ */
+body:has(.factura-page) .sidebar,
+body:has(.factura-page) .topbar,
+body:has(.informe-page) .sidebar,
+body:has(.informe-page) .topbar {
+  display: none !important;
+}
+
+body:has(.factura-page) .main-content,
+body:has(.informe-page) .main-content {
+  margin-left: 0 !important;
+}

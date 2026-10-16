@@ -18,45 +18,32 @@ import { Repuesto } from '../../core/models/repuesto.model';
   styleUrl: './trabajos.component.css',
 })
 export class TrabajosComponent implements OnInit {
-  // ============================================
-  // SERVICIOS
-  // ============================================
   private trabajoService = inject(TrabajoService);
   private clienteService = inject(ClienteService);
   private carroService = inject(CarroService);
   private repuestoService = inject(RepuestoService);
   private router = inject(Router);
 
-  // ============================================
-  // LISTAS
-  // ============================================
+  // Listas
   trabajos = signal<Trabajo[]>([]);
   clientes = signal<Cliente[]>([]);
   carros = signal<Carro[]>([]);
   repuestosDisponibles = signal<Repuesto[]>([]);
 
-  // ============================================
-  // ESTADOS
-  // ============================================
+  // Estados
   busqueda = signal<string>('');
   filtroEstado = signal<string>('todos');
   cargando = signal<boolean>(false);
   error = signal<string | null>(null);
 
-  // ============================================
-  // MODAL
-  // ============================================
+  // Modal
   mostrarModal = signal<boolean>(false);
 
-  // ============================================
-  // FORMULARIO
-  // ============================================
+  // Formulario
   trabajoForm: Trabajo = this.limpiarForm();
   repuestosSeleccionados: RepuestoUsado[] = [];
 
-  // ============================================
-  // FOTOS
-  // ============================================
+  // Fotos
   fotoClientePreview = signal<string | null>(null);
   fotoCarroPreview = signal<string | null>(null);
 
@@ -67,9 +54,6 @@ export class TrabajosComponent implements OnInit {
     this.cargarCatalogos();
   }
 
-  // ============================================
-  // FORMULARIO
-  // ============================================
   limpiarForm(): Trabajo {
     return {
       cliente_id: 0,
@@ -84,9 +68,6 @@ export class TrabajosComponent implements OnInit {
     };
   }
 
-  // ============================================
-  // CARGAR DATOS
-  // ============================================
   cargar() {
     this.cargando.set(true);
     this.error.set(null);
@@ -138,7 +119,7 @@ export class TrabajosComponent implements OnInit {
 
   get costoRepuestosCalculado(): number {
     return this.repuestosSeleccionados.reduce(
-      (sum, r) => sum + (r.precio_unitario || 0) * r.cantidad,
+      (sum, r) => sum + (Number(r.precio_unitario) || 0) * r.cantidad,
       0
     );
   }
@@ -254,6 +235,27 @@ export class TrabajosComponent implements OnInit {
     this.repuestosSeleccionados.splice(index, 1);
   }
 
+  // ✅ NUEVO MÉTODO: Cambia el repuesto Y actualiza el precio
+  cambiarRepuestoPorId(index: number, nuevoId: number) {
+    const id = Number(nuevoId);
+    const item = this.repuestosSeleccionados[index];
+    if (!item) return;
+
+    item.repuesto_id = id;
+
+    const rep = this.repuestosDisponibles().find((r) => r.id === id);
+    if (rep) {
+      item.precio_unitario = Number(rep.precio_venta);
+    }
+  }
+
+  // ✅ NUEVO MÉTODO: Recalcula al cambiar la cantidad
+  recalcularRepuesto(index: number) {
+    // No hace nada más, porque el cálculo se hace en el getter
+    // Pero al mutar el objeto del array, Angular re-renderiza
+  }
+
+  // Métodos viejos (por compatibilidad)
   cambiarRepuesto(index: number) {
     const item = this.repuestosSeleccionados[index];
     const rep = this.repuestosDisponibles().find((r) => r.id === item.repuesto_id);
@@ -316,7 +318,7 @@ export class TrabajosComponent implements OnInit {
   }
 
   // ============================================
-  // VER INFORME DE SERVICIO ← NUEVO
+  // VER INFORME
   // ============================================
   verInforme(t: Trabajo) {
     if (!t.id) return;

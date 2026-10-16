@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
@@ -19,6 +19,11 @@ export class LoginComponent {
 
   cargando = signal(false);
   error = signal<string | null>(null);
+  mostrarPassword = signal(false);
+
+  togglePassword() {
+    this.mostrarPassword.set(!this.mostrarPassword());
+  }
 
   onSubmit() {
     if (!this.email || !this.password) {
